@@ -23,7 +23,7 @@ func helpCommand(
 
 	msg := "```\n" +
 		"!help - Show this message\n" +
-		"!premint - Check if you are a registered on Premint\n"
+		"/premint - Check if you are a registered on Premint\n"
 
 	if p.config.OwnerID == m.Author.ID {
 

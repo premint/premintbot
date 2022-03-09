@@ -5,11 +5,12 @@ import (
 	"log"
 
 	"cloud.google.com/go/firestore"
+	"github.com/mager/premintbot/config"
 )
 
 // ProvideDB provides a firestore client
-func ProvideDB() *firestore.Client {
-	projectID := "portalxyz"
+func ProvideDB(cfg config.Config) *firestore.Client {
+	projectID := cfg.GoogleCloudProject
 
 	client, err := firestore.NewClient(context.TODO(), projectID)
 	if err != nil {

@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	DiscordAuthToken string
-	PremintAPIKey    string
+	DiscordAuthToken   string
+	GoogleCloudProject string
 }
 
 func ProvideConfig() Config {

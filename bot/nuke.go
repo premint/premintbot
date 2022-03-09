@@ -22,9 +22,15 @@ func nukeCommand(
 	p := getConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 
+	// Make sure owner is sending the message
+	if m.Author.ID != g.OwnerID {
+		s.ChannelMessageSend(m.ChannelID, "You must be the guild owner to use this command.")
+		return
+	}
+
 	// Delete channels
 	for _, channel := range g.Channels {
-		if channel.Name == "portal-config" || channel.Name == "portal" {
+		if channel.Name == "premint-config" || channel.Name == "premint" {
 			s.ChannelDelete(channel.ID)
 			logger.Infow("Deleted channel", zap.String("channel", channel.Name))
 		}

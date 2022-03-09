@@ -15,7 +15,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 	return func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		// Return early if the portal channel category exists
 		for _, category := range g.Guild.Channels {
-			if category.Name == "portal" {
+			if category.Name == "premint" {
 				return
 			}
 		}
@@ -62,7 +62,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			g.Guild.ID,
 			discordgo.GuildChannelCreateData{
 				Type:                 discordgo.ChannelTypeGuildCategory,
-				Name:                 "portal",
+				Name:                 "premint",
 				PermissionOverwrites: permissionOverwrites,
 			},
 		)
@@ -75,7 +75,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			g.Guild.ID,
 			discordgo.GuildChannelCreateData{
 				Type:                 discordgo.ChannelTypeGuildText,
-				Name:                 "portal-config",
+				Name:                 "premint-config",
 				ParentID:             group.ID,
 				PermissionOverwrites: permissionOverwrites,
 			},

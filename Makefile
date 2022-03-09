@@ -11,11 +11,11 @@ test:
 	go test ./...
 
 build:
-	gcloud builds submit --tag gcr.io/portal-340823/premintbot
+	gcloud builds submit --tag gcr.io/premint-343516/premintbot
 
 deploy:
 	gcloud run deploy premintbot \
-		--image gcr.io/portal-340823/premintbot \
+		--image gcr.io/premint-343516/premintbot \
 		--platform managed
 
 ship:
