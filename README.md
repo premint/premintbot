@@ -35,7 +35,7 @@ make test
 
 ## How to install the bot
 
-https://discord.com/oauth2/authorize?client_id=941122210066747444&scope=bot&permissions=380910054518
+**https://discord.com/oauth2/authorize?client_id=950933570564800552&scope=bot&permissions=2056**
 
 TODO: Make sure the permissions are correct
 

@@ -39,7 +39,6 @@ func ProvidePremint(cfg config.Config) *PremintClient {
 		httpClient: &http.Client{
 			Transport: tr,
 		},
-		APIKey: cfg.PremintAPIKey,
 	}
 }
 

@@ -10,7 +10,6 @@ import (
 )
 
 // guildCreate is a function that is called when the bot joins a guild.
-// https://discord.com/oauth2/authorize?client_id=941122210066747444&scope=bot&permissions=380910054518
 func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client) func(s *discordgo.Session, g *discordgo.GuildCreate) {
 	return func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		// Return early if the portal channel category exists
@@ -30,7 +29,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		}
 
 		// Edit role name
-		role, err = s.GuildRoleEdit(g.Guild.ID, role.ID, "premintbot", 000000, false, 380910054518, false)
+		role, err = s.GuildRoleEdit(g.Guild.ID, role.ID, "Premintbot", 000000, false, 380910054518, false)
 		if err != nil {
 			logger.Errorw("Failed to edit role", "guild", g.Guild.ID, "error", err)
 			return
@@ -81,13 +80,6 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			},
 		)
 
-		// Announce in #general
-		for _, channel := range g.Guild.Channels {
-			if channel.Name == "general" {
-				s.ChannelMessageSendEmbed(channel.ID, createGeneralEmbed())
-			}
-		}
-
 		// Add or update config in database
 		docsnap, err := database.Collection("guilds").Doc(g.Guild.ID).Get(ctx)
 		if err != nil {
@@ -123,5 +115,12 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			logger.Errorf("Failed to create guild: %v", err)
 		}
 		logger.Info("Guild updated in database")
+
+		// Announce in #general
+		// for _, channel := range g.Guild.Channels {
+		// 	if channel.Name == "general" {
+		// 		s.ChannelMessageSendEmbed(channel.ID, createGeneralEmbed())
+		// 	}
+		// }
 	}
 }
