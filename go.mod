@@ -4,9 +4,8 @@ go 1.16
 
 require (
 	cloud.google.com/go/firestore v1.6.1
-	github.com/bwmarrin/discordgo v0.23.2
+	github.com/bwmarrin/discordgo v0.24.0
 	github.com/gorilla/mux v1.8.0
-	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/fx v1.16.0
