@@ -8,7 +8,14 @@ import (
 	"go.uber.org/zap"
 )
 
-type Resp struct {
+type HealthResp struct {
+	Status string `json:"status"`
+}
+
+type DebugReq struct {
+}
+
+type DebugResp struct {
 	Status string `json:"status"`
 }
 
@@ -32,11 +39,23 @@ func New(
 func (h *Handler) registerRoutes() {
 	h.router.HandleFunc("/health", h.health).
 		Methods("GET")
+	h.router.HandleFunc("/debug", h.health).
+		Methods("POST")
 }
 
 func (h *Handler) health(w http.ResponseWriter, r *http.Request) {
 	var (
-		resp = Resp{}
+		resp = HealthResp{}
+	)
+
+	resp.Status = "OK"
+
+	json.NewEncoder(w).Encode(resp)
+}
+
+func (h *Handler) debug(w http.ResponseWriter, r *http.Request) {
+	var (
+		resp = DebugResp{}
 	)
 
 	resp.Status = "OK"

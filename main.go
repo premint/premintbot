@@ -46,7 +46,6 @@ func Register(
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	bot.Start(dg, logger, database, premintClient)
-	logger.Infow("CONFIG", "config", cfg)
 	// Start the handler for health checks
 	handler.New(logger, router)
 }
