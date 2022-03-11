@@ -24,6 +24,18 @@ var (
 			},
 		},
 	}
+	setupPremintCmd = &discordgo.ApplicationCommand{
+		Name:        "setup-premint",
+		Description: "Add your Premint API key to the bot",
+		Options: []*discordgo.ApplicationCommandOption{
+			{
+				Type:        discordgo.ApplicationCommandOptionString,
+				Name:        "API Key",
+				Description: "Your Premint API key",
+				Required:    true,
+			},
+		},
+	}
 )
 
 func Start(
@@ -44,21 +56,12 @@ func Start(
 	// https://github.com/bwmarrin/discordgo/blob/v0.23.2/structs.go#L1295
 	// dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds
 
-	// Slash commands
-	// dg.AddHandler(slashCommand(ctx, logger, database, premintClient))
-
 	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	dg.AddHandler(slashCommand(ctx, logger, database, premintClient))
-
-	ccmd, err := dg.ApplicationCommandCreate("950933570564800552", "", premintCmd)
-	if err != nil {
-		logger.Panicf("Cannot create '%v' command: %v", premintCmd.Name, err)
-	} else {
-		logger.Infof("Created '%v' command", ccmd.Name)
-	}
+	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient))
+	dg.ApplicationCommandCreate("950933570564800552", "", premintCmd)
 
 	// Open a websocket connection to Discord and begin listening.
 	wsErr := dg.Open()
@@ -117,7 +120,7 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 	return guild
 }
 
-func slashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		p := getConfig(ctx, logger, database, i.GuildID)
 
