@@ -13,40 +13,16 @@ import (
 var (
 	integerOptionMinValue = 1.0
 	premintCmd            = &discordgo.ApplicationCommand{
-		Name:        "pppp",
-		Description: "Command for demonstrating options",
+		Name:        "premint",
+		Description: "Check if your address is registered with Premint",
 		Options: []*discordgo.ApplicationCommandOption{
-
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "address",
-				Description: "String option",
-				Required:    false,
+				Description: "Your ETH address",
+				Required:    true,
 			},
 		},
-	}
-	premintCmdHandler = func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		margs := []interface{}{
-			// Here we need to convert raw interface{} value to wanted type.
-			// Also, as you can see, here is used utility functions to convert the value
-			// to particular type. Yeah, you can use just switch type,
-			// but this is much simpler
-			i.ApplicationCommandData().Options[0].StringValue(),
-		}
-		msgformat :=
-			` Now you just learned how to use command options. Take a look to the value of which you've just entered:
-				> string_option: %s
-`
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			// Ignore type for now, we'll discuss them in "responses" part
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: fmt.Sprintf(
-					msgformat,
-					margs...,
-				),
-			},
-		})
 	}
 )
 
@@ -75,18 +51,13 @@ func Start(
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	dg.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if i.User == nil {
-			logger.Infof("Interaction created: %v", i.ID)
-			premintCmdHandler(s, i)
-		}
-	})
+	dg.AddHandler(slashCommand(ctx, logger, database, premintClient))
 
 	ccmd, err := dg.ApplicationCommandCreate("950933570564800552", "", premintCmd)
 	if err != nil {
 		logger.Panicf("Cannot create '%v' command: %v", premintCmd.Name, err)
 	} else {
-		logger.Infof("Created '%v' command", premintCmd.Name)
+		logger.Infof("Created '%v' command", ccmd.Name)
 	}
 
 	// Open a websocket connection to Discord and begin listening.
@@ -148,13 +119,40 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 
 func slashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+		p := getConfig(ctx, logger, database, i.GuildID)
+
+		if p.config.PremintAPIKey == "" {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Premint API key is not set. Please use `premint setup` command to set it.",
+				},
+			})
+			return
+		}
+
 		address := i.ApplicationCommandData().Options[0].StringValue()
-		logger.Info("Slash command", zap.String("address", address))
+		// TODO: Validate ETH address
+		// TODO: Handle when no addres is passed in
+		// snowflake := i.User.ID
+
+		status, err := premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
+		if err != nil {
+			logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
+			return
+		}
+
+		var message string
+		if status {
+			message = "You are registered for Premint!"
+		} else {
+			message = "You are not registered for Premint"
+		}
+
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			// Ignore type for now, we'll discuss them in "responses" part
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "Testing",
+				Content: message,
 			},
 		})
 	}

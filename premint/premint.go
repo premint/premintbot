@@ -72,3 +72,33 @@ func CheckPremintStatus(apiKey, userID string) (bool, error) {
 
 	return r.Registered, nil
 }
+
+func CheckPremintStatusForAddress(apiKey, userID string) (bool, error) {
+	url := fmt.Sprintf("https://www.premint.xyz/api/%s/wallet/%s", apiKey, userID)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatal(err)
+		return false, nil
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+		return false, nil
+	}
+
+	defer resp.Body.Close()
+
+	var (
+		r CheckPremintStatusResp
+	)
+
+	err = json.NewDecoder(resp.Body).Decode(&r)
+	if err != nil {
+		log.Fatal(err)
+		return false, nil
+	}
+
+	return r.Registered, nil
+}
