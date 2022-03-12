@@ -1,6 +1,6 @@
 # premintbot
 
-TODO: What it does
+A Discord bot for Premint.
 
 ## How to run locally
 
@@ -35,7 +35,7 @@ make test
 
 ## How to install the bot
 
-**https://discord.com/oauth2/authorize?client_id=950933570564800552&scope=bot&permissions=2056**
+**https://discord.com/oauth2/authorize?client_id=950933570564800552&scope=bot%20applications.commands&permissions=268438552**
 
 TODO: Make sure the permissions are correct
 
@@ -53,13 +53,13 @@ make ship
 gcloud run services update premintbot --set-env-vars PREMINTBOT_DISCORDAUTHTOKEN=REDACTED,PREMINTBOT_GOOGLECLOUDPROJECT=premint-343516
 ```
 
-## Data Model
+## Database (Firestore)
 
-[Guild] => []
+https://console.cloud.google.com/firestore/data/guilds?referrer=search&project=premint-343516
 
 ## Bot Pinger
 
-TODO: Add Cloud Scheduler link
+Cloud Scheduler link, runs every 5 min: https://console.cloud.google.com/cloudscheduler?project=premint-343516
 
 ## Endpoints
 
