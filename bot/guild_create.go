@@ -70,7 +70,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		}
 
 		// Create #portal-config channel
-		s.GuildChannelCreateComplex(
+		c, err := s.GuildChannelCreateComplex(
 			g.Guild.ID,
 			discordgo.GuildChannelCreateData{
 				Type:                 discordgo.ChannelTypeGuildText,
@@ -79,6 +79,9 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 				PermissionOverwrites: permissionOverwrites,
 			},
 		)
+		if err != nil {
+			logger.Errorf("Failed to create channel: %v", err)
+		}
 
 		// Add or update config in database
 		docsnap, err := database.Collection("guilds").Doc(g.Guild.ID).Get(ctx)
@@ -116,11 +119,17 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		}
 		logger.Info("Guild updated in database")
 
-		// Announce in #general
-		// for _, channel := range g.Guild.Channels {
-		// 	if channel.Name == "general" {
-		// 		s.ChannelMessageSendEmbed(channel.ID, createGeneralEmbed())
-		// 	}
-		// }
+		s.ChannelMessageSendEmbed(c.ID, createGeneralEmbed())
+	}
+}
+
+func createGeneralEmbed() *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Title:       "Premint Bot",
+		Description: "Hello! My name is Premint Bot. I am a bot that helps you manage your Discord server. Set your Premint API by running !set-premint <API Key>. Run !help for a list of commands.",
+		Color:       0x00ff00,
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: "https://cdn.discordapp.com/avatars/420864490981227266/b7f9f9a9c7b6e5e6f7e8f8c1b7f1f2d6.png?size=2048",
+		},
 	}
 }
