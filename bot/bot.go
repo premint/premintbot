@@ -20,7 +20,7 @@ var (
 				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "address",
 				Description: "Your ETH address",
-				Required:    true,
+				Required:    false,
 			},
 		},
 	}
@@ -94,7 +94,6 @@ func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *fir
 
 		// Public commands
 		helpCommand(ctx, logger, database, s, m)
-		premintCommand(ctx, logger, database, premintClient, s, m)
 	}
 }
 
@@ -118,45 +117,4 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 		}
 	}
 	return guild
-}
-
-func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		p := getConfig(ctx, logger, database, i.GuildID)
-
-		if p.config.PremintAPIKey == "" {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: "Premint API key is not set. Please use `premint setup` command to set it.",
-				},
-			})
-			return
-		}
-
-		address := i.ApplicationCommandData().Options[0].StringValue()
-		// TODO: Validate ETH address
-		// TODO: Handle when no addres is passed in
-		// snowflake := i.User.ID
-
-		status, err := premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
-		if err != nil {
-			logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
-			return
-		}
-
-		var message string
-		if status {
-			message = "You are registered for Premint!"
-		} else {
-			message = "You are not registered for Premint"
-		}
-
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: message,
-			},
-		})
-	}
 }

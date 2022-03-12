@@ -19,7 +19,9 @@ type GetWalletAddressesResp struct {
 }
 
 type CheckPremintStatusResp struct {
-	Registered bool `json:"registered"`
+	Registered    bool   `json:"registered"`
+	DiscordID     int    `json:"discord_id"`
+	WalletAddress string `json:"wallet_address"`
 }
 
 type PremintClient struct {
@@ -44,8 +46,8 @@ func ProvidePremint(cfg config.Config) *PremintClient {
 
 var Options = ProvidePremint
 
-func CheckPremintStatus(apiKey, userID string) (bool, error) {
-	url := fmt.Sprintf("https://www.premint.xyz/api/%s/entry/%s", apiKey, userID)
+func CheckPremintStatusForUser(apiKey, userID string) (bool, error) {
+	url := fmt.Sprintf("https://www.premint.xyz/api/%s/discord/%s", apiKey, userID)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -73,8 +75,8 @@ func CheckPremintStatus(apiKey, userID string) (bool, error) {
 	return r.Registered, nil
 }
 
-func CheckPremintStatusForAddress(apiKey, userID string) (bool, error) {
-	url := fmt.Sprintf("https://www.premint.xyz/api/%s/wallet/%s", apiKey, userID)
+func CheckPremintStatusForAddress(apiKey, address string) (bool, error) {
+	url := fmt.Sprintf("https://www.premint.xyz/api/%s/wallet/%s", apiKey, address)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
