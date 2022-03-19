@@ -71,7 +71,7 @@ Cloud Scheduler link, runs every 5 min: https://console.cloud.google.com/cloudsc
 
 ## Legacy Commands
 
-- `!help` - TODO: Update to Slash command
-- `!setup` - TODO: Update to Slash command
-- `!set-premint` - TODO: Update to Slash command
-- `!nuke` - TODO: Update to Slash command
+- `!help` - Help
+- `!setup` - Check setup status
+- `!set-premint` - Set Premint API key
+- `!nuke` - Delete all channels & roles

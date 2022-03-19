@@ -2,9 +2,11 @@ package bot
 
 import (
 	"context"
+	"fmt"
 
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
+	"github.com/kr/pretty"
 	"github.com/mager/premintbot/premint"
 	"go.uber.org/zap"
 )
@@ -23,13 +25,14 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			return
 		}
 
-		var status bool
 		var err error
 		var message string
-
 		cmdData := i.ApplicationCommandData()
+
+		pretty.Print(cmdData)
+		resp := premint.CheckPremintStatusResp{}
 		if cmdData.Options == nil {
-			status, err = premint.CheckPremintStatusForUser(p.config.PremintAPIKey, i.Interaction.Member.User.ID)
+			resp, err = premint.CheckPremintStatusForUser(p.config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return
@@ -37,17 +40,17 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		} else {
 			// TODO: Validate ETH address
 			address := i.ApplicationCommandData().Options[0].StringValue()
-			status, err = premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
+			resp, err = premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return
 			}
 		}
 
-		if status {
-			message = "You are registered for Premint!"
+		if resp.Registered {
+			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 		} else {
-			message = "You are not registered for Premint"
+			message = fmt.Sprintf("❌ Wallet %s is not registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 		}
 
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

@@ -21,6 +21,8 @@ type Guild struct {
 
 	// Premint settings
 	PremintAPIKey string `firestore:"premint-api-key"`
+	PremintRole   string `firestore:"premint-role"`
+	PremintRoleID string `firestore:"premint-role-id"`
 }
 
 type ConfigParams struct {
@@ -45,7 +47,6 @@ func getConfig(
 	config := &Guild{}
 	err = docSnap.DataTo(config)
 	if err != nil {
-		logger.Errorw("Failed to get config", "guild", guildID, "error", err)
 		return nil
 	}
 

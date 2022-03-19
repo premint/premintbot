@@ -15,7 +15,7 @@ func nukeCommand(
 	s *discordgo.Session,
 	m *discordgo.MessageCreate,
 ) {
-	if m.Content != "!nuke" {
+	if m.Content != "!premint-nuke" {
 		return
 	}
 

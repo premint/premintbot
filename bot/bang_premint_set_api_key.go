@@ -16,15 +16,15 @@ func setPremintCommand(
 	s *discordgo.Session,
 	m *discordgo.MessageCreate,
 ) {
-	p := getConfig(ctx, logger, database, m.GuildID)
-
-	// Regex match !set-premint <API Key>
-	re := regexp.MustCompile(`^!set-premint (.*)$`)
+	// Regex match !premint-set-api-key <API Key>
+	re := regexp.MustCompile(`^!premint-set-api-key (.*)$`)
 	match := re.FindStringSubmatch(m.Content)
 
 	if len(match) != 2 {
 		return
 	}
+
+	p := getConfig(ctx, logger, database, m.GuildID)
 
 	// Set the Premint API Key
 	p.doc.Ref.Update(ctx, []firestore.Update{{Path: "premint-api-key", Value: match[1]}})

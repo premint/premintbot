@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -39,6 +40,9 @@ func Register(
 	router *mux.Router,
 	premintClient *premint.PremintClient,
 ) {
+	// Start the handler for health checks
+	handler.New(logger, router)
+
 	// Setup Discord Bot
 	token := fmt.Sprintf("Bot %s", cfg.DiscordAuthToken)
 	dg, err := discordgo.New(token)
@@ -46,6 +50,16 @@ func Register(
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	bot.Start(dg, logger, database, premintClient)
-	// Start the handler for health checks
-	handler.New(logger, router)
+
+	// Cleanly close down the Discord session.
+	lc.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			logger.Info("Closing Discord session")
+			defer dg.Close()
+			if err != nil {
+				logger.Errorf("Failed to close Discord session: %v", err)
+			}
+			return err
+		},
+	})
 }

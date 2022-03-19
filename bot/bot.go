@@ -91,6 +91,7 @@ func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *fir
 		nukeCommand(ctx, logger, database, s, m)
 		setupCommand(ctx, logger, database, s, m)
 		setPremintCommand(ctx, logger, database, s, m)
+		setRoleCommand(ctx, logger, database, s, m)
 
 		// Public commands
 		helpCommand(ctx, logger, database, s, m)
@@ -106,4 +107,8 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 		}
 	}
 	return guild
+}
+
+func isAdmin(p *ConfigParams, a discordgo.Member) bool {
+	return false
 }

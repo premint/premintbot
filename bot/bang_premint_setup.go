@@ -16,11 +16,13 @@ func setupCommand(
 	s *discordgo.Session,
 	m *discordgo.MessageCreate,
 ) {
-	if m.Content != "!setup" {
+	if m.Content != "!premint-setup" {
 		return
 	}
 
 	p := getConfig(ctx, logger, database, m.GuildID)
+
+	// TODO: Make sure they have the admin role
 
 	completed := false
 	msg := "```\n"
@@ -29,9 +31,9 @@ func setupCommand(
 	// Check if the guild is already setup
 	if p.config.PremintAPIKey != "" {
 		completed = true
-		msg += "✅ Your Premint is connected: " + p.config.PremintAPIKey + "\n"
+		msg += "✅ Connected to project API Key: `" + p.config.PremintAPIKey + "`\n"
 	} else {
-		msg += "❌ Your Premint is not connected, run !set-premint <API Key> to update it.\n"
+		msg += "❌ Your Premint project is not connected, run !premint-set-api-key <API Key> to update it.\n"
 	}
 
 	if completed {
