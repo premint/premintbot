@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	appID                 = "950933570564800552"
 	integerOptionMinValue = 1.0
 	premintCmd            = &discordgo.ApplicationCommand{
 		Name:        "premint",
@@ -61,7 +62,7 @@ func Start(
 	})
 
 	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient))
-	dg.ApplicationCommandCreate("950933570564800552", "", premintCmd)
+	dg.ApplicationCommandCreate(appID, "", premintCmd)
 
 	// Open a websocket connection to Discord and begin listening.
 	wsErr := dg.Open()

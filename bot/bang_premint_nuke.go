@@ -19,7 +19,7 @@ func premintNukeCommand(
 		return
 	}
 
-	p := getConfig(ctx, logger, database, m.GuildID)
+	p := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 
 	// Make sure owner is sending the message

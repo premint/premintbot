@@ -12,9 +12,9 @@ import (
 
 func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		p := getConfig(ctx, logger, database, i.GuildID)
+		p := GetConfig(ctx, logger, database, i.GuildID)
 
-		if p.config.PremintAPIKey == "" {
+		if p.Config.PremintAPIKey == "" {
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -31,7 +31,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		resp := premint.CheckPremintStatusResp{}
 		if cmdData.Options == nil {
 			logger.Info("Checking premint status with the Discord user ID")
-			resp, err = premint.CheckPremintStatusForUser(p.config.PremintAPIKey, i.Interaction.Member.User.ID)
+			resp, err = premint.CheckPremintStatusForUser(p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return
@@ -40,7 +40,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			// TODO: Validate ETH address
 			logger.Info("Checking premint status with the ETH wallet address")
 			address := i.ApplicationCommandData().Options[0].StringValue()
-			resp, err = premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
+			resp, err = premint.CheckPremintStatusForAddress(p.Config.PremintAPIKey, address)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return

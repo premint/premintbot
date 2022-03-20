@@ -30,13 +30,13 @@ func premintSetRoleCommand(
 		return
 	}
 
-	p := getConfig(ctx, logger, database, m.GuildID)
+	p := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 	roleID := match[1]
 
 	// Make sure the user has the Premintbot role: loop through their roles and make sure they have the guild admin role.
 	for _, r := range m.Member.Roles {
-		if r == p.config.GuildAdminRoleID {
+		if r == p.Config.GuildAdminRoleID {
 			for _, role := range g.Roles {
 				if role.ID == roleID {
 					p.doc.Ref.Update(ctx, []firestore.Update{

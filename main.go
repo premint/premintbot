@@ -40,8 +40,6 @@ func Register(
 	router *mux.Router,
 	premintClient *premint.PremintClient,
 ) {
-	// Start the handler for health checks
-	handler.New(logger, router)
 
 	// Setup Discord Bot
 	token := fmt.Sprintf("Bot %s", cfg.DiscordAuthToken)
@@ -50,6 +48,8 @@ func Register(
 		log.Fatalf("Failed to create client: %v", err)
 	}
 	bot.Start(dg, logger, database, premintClient)
+	// Route handler
+	handler.New(logger, router, database, dg)
 
 	// Cleanly close down the Discord session.
 	lc.Append(fx.Hook{

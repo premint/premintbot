@@ -1,9 +1,8 @@
 package handler
 
 import (
-	"encoding/json"
-	"net/http"
-
+	"cloud.google.com/go/firestore"
+	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 )
@@ -21,16 +20,20 @@ type DebugResp struct {
 
 // Handler struct for HTTP requests
 type Handler struct {
-	logger *zap.SugaredLogger
-	router *mux.Router
+	bot      *discordgo.Session
+	database *firestore.Client
+	logger   *zap.SugaredLogger
+	router   *mux.Router
 }
 
 // New creates a Handler struct
 func New(
 	logger *zap.SugaredLogger,
 	router *mux.Router,
+	database *firestore.Client,
+	bot *discordgo.Session,
 ) *Handler {
-	h := Handler{logger, router}
+	h := Handler{bot, database, logger, router}
 	h.registerRoutes()
 	return &h
 }
@@ -39,26 +42,8 @@ func New(
 func (h *Handler) registerRoutes() {
 	h.router.HandleFunc("/health", h.health).
 		Methods("GET")
-	h.router.HandleFunc("/debug", h.health).
+	h.router.HandleFunc("/debug", h.debug).
 		Methods("POST")
-}
-
-func (h *Handler) health(w http.ResponseWriter, r *http.Request) {
-	var (
-		resp = HealthResp{}
-	)
-
-	resp.Status = "OK"
-
-	json.NewEncoder(w).Encode(resp)
-}
-
-func (h *Handler) debug(w http.ResponseWriter, r *http.Request) {
-	var (
-		resp = DebugResp{}
-	)
-
-	resp.Status = "OK"
-
-	json.NewEncoder(w).Encode(resp)
+	h.router.HandleFunc("/assign_role", h.assignRole).
+		Methods("POST")
 }

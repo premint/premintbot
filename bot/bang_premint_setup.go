@@ -20,19 +20,19 @@ func premintSetupCommand(
 		return
 	}
 
-	p := getConfig(ctx, logger, database, m.GuildID)
+	p := GetConfig(ctx, logger, database, m.GuildID)
 
 	// TODO: Make sure they have the admin role
 
-	apiKeySet := p.config.PremintAPIKey != ""
-	roleSet := p.config.PremintRoleID != "" && p.config.PremintRoleName != ""
+	apiKeySet := p.Config.PremintAPIKey != ""
+	roleSet := p.Config.PremintRoleID != "" && p.Config.PremintRoleName != ""
 	completed := apiKeySet && roleSet
 
 	// Check if the Premint API key is set
 	apiKeyField := &discordgo.MessageEmbedField{}
 	if apiKeySet {
 		apiKeyField.Name = "✅ Connected project API Key"
-		apiKeyField.Value = "`" + p.config.PremintAPIKey + "`"
+		apiKeyField.Value = "`" + p.Config.PremintAPIKey + "`"
 	} else {
 		apiKeyField.Name = "❌ Missing project API Key"
 		apiKeyField.Value = "Use `!premint-set-api-key <API Key>` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API."
@@ -42,7 +42,7 @@ func premintSetupCommand(
 	roleField := &discordgo.MessageEmbedField{}
 	if roleSet {
 		roleField.Name = "✅ Role is set"
-		roleField.Value = "`" + p.config.PremintRoleName + "`"
+		roleField.Value = "`" + p.Config.PremintRoleName + "`"
 	} else {
 		roleField.Name = "❌ Role is not set"
 		roleField.Value = "Use `!premint-set-role <Role ID>` to set it. You can find your role ID but right clicking it > Copy ID."

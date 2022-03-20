@@ -27,11 +27,11 @@ type Guild struct {
 }
 
 type ConfigParams struct {
-	config *Guild
+	Config *Guild
 	doc    *firestore.DocumentSnapshot
 }
 
-func getConfig(
+func GetConfig(
 	ctx context.Context,
 	logger *zap.SugaredLogger,
 	database *firestore.Client,
@@ -52,7 +52,7 @@ func getConfig(
 	}
 
 	return &ConfigParams{
-		config: config,
+		Config: config,
 		doc:    docSnap,
 	}
 }

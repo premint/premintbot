@@ -30,12 +30,12 @@ func premintSetAPIKeyCommand(
 		return
 	}
 
-	p := getConfig(ctx, logger, database, m.GuildID)
+	p := GetConfig(ctx, logger, database, m.GuildID)
 	apiKey := match[1]
 
 	// Make sure the user has the Premintbot role: loop through their roles and make sure they have the guild admin role.
 	for _, r := range m.Member.Roles {
-		if r == p.config.GuildAdminRoleID {
+		if r == p.Config.GuildAdminRoleID {
 			p.doc.Ref.Update(ctx, []firestore.Update{
 				{Path: "premint-api-key", Value: apiKey},
 			})
