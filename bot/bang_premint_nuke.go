@@ -38,7 +38,7 @@ func premintNukeCommand(
 
 	// Delete roles
 	for _, role := range g.Roles {
-		if role.Name == "Premintbot" {
+		if role.Name == "Premintbot" || role.Name == "Premint Bot" {
 			s.GuildRoleDelete(g.ID, role.ID)
 			logger.Infow("Deleted role", zap.String("role", role.Name))
 		}

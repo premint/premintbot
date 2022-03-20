@@ -119,10 +119,9 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 
 		_, err = database.Collection("guilds").Doc(g.Guild.ID).Set(ctx, guild)
 		if err != nil {
-			logger.Errorf("Failed to create guild: %v", err)
+			logger.Errorf("Failed to create guild in Firestore: %v", err)
 		}
 		logger.Info("Guild updated in database")
-
 		s.ChannelMessageSendEmbed(c.ID, createGeneralEmbed())
 	}
 }
