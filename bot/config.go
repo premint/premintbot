@@ -56,3 +56,29 @@ func GetConfig(
 		doc:    docSnap,
 	}
 }
+
+func GetConfigWithAPIKey(
+	ctx context.Context,
+	logger *zap.SugaredLogger,
+	database *firestore.Client,
+	apiKey string,
+) *ConfigParams {
+	// Fetch the config for the guild based on the premint-api-key
+	docSnap, err := database.Collection("guilds").Where("premint-api-key", "==", apiKey).Limit(1).Documents(ctx).Next()
+	if err != nil {
+		logger.Errorw("Failed to get config", "api_key", apiKey, "error", err)
+		return nil
+	}
+
+	// Get the config
+	config := &Guild{}
+	err = docSnap.DataTo(config)
+	if err != nil {
+		return nil
+	}
+
+	return &ConfigParams{
+		Config: config,
+		doc:    docSnap,
+	}
+}
