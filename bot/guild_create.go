@@ -4,6 +4,9 @@ import (
 	"context"
 	"time"
 
+	bq "github.com/mager/premintbot/bigquery"
+
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
@@ -12,7 +15,7 @@ import (
 var premintCategoryName = "premint"
 
 // guildCreate is a function that is called when the bot joins a guild.
-func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client) func(s *discordgo.Session, g *discordgo.GuildCreate) {
+func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, bqClient *bigquery.Client) func(s *discordgo.Session, g *discordgo.GuildCreate) {
 	return func(s *discordgo.Session, g *discordgo.GuildCreate) {
 		ownerID := g.Guild.OwnerID
 		guildID := g.Guild.ID
@@ -108,13 +111,14 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		}
 
 		// Create the guild
+		joinedAt := time.Now()
 		guild = Guild{
 			Active:           true,
 			GuildID:          g.Guild.ID,
 			GuildName:        g.Guild.Name,
 			GuildAdminRoleID: role.ID,
 			OwnerID:          ownerID,
-			JoinedAt:         time.Now(),
+			JoinedAt:         joinedAt,
 		}
 
 		_, err = database.Collection("guilds").Doc(g.Guild.ID).Set(ctx, guild)
@@ -122,6 +126,9 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			logger.Errorf("Failed to create guild in Firestore: %v", err)
 		}
 		logger.Info("Guild updated in database")
+
+		bq.RecordGuildsCreate(bqClient, g.Guild.ID, g.Guild.Name, role.ID, ownerID, joinedAt)
+
 		s.ChannelMessageSendEmbed(c.ID, createGeneralEmbed())
 	}
 }

@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
+	bq "github.com/mager/premintbot/bigquery"
+
 	"github.com/mager/premintbot/bot"
 	"github.com/mager/premintbot/config"
 	"github.com/mager/premintbot/database"
@@ -22,6 +25,7 @@ import (
 func main() {
 	fx.New(
 		fx.Provide(
+			bq.Options,
 			config.Options,
 			database.Options,
 			logger.Options,
@@ -34,6 +38,7 @@ func main() {
 
 func Register(
 	lc fx.Lifecycle,
+	bqClient *bigquery.Client,
 	cfg config.Config,
 	database *firestore.Client,
 	logger *zap.SugaredLogger,
@@ -47,7 +52,7 @@ func Register(
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
-	bot.Start(dg, logger, database, premintClient)
+	bot.Start(dg, logger, database, premintClient, bqClient)
 	// Route handler
 	handler.New(logger, router, database, dg)
 

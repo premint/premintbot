@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
 	"github.com/mager/premintbot/premint"
@@ -44,6 +45,7 @@ func Start(
 	logger *zap.SugaredLogger,
 	database *firestore.Client,
 	premintClient *premint.PremintClient,
+	bqClient *bigquery.Client,
 ) {
 	ctx := context.Background()
 	logger.Info("Registering Discord bot")
@@ -52,7 +54,7 @@ func Start(
 	dg.AddHandler(messageCreate(ctx, logger, database, premintClient))
 
 	// Register the guildCreate func as a callback for GuildCreate events.
-	dg.AddHandler(guildCreate(ctx, logger, database))
+	dg.AddHandler(guildCreate(ctx, logger, database, bqClient))
 
 	// https://github.com/bwmarrin/discordgo/blob/v0.23.2/structs.go#L1295
 	// dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds

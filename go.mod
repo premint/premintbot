@@ -3,6 +3,7 @@ module github.com/mager/premintbot
 go 1.16
 
 require (
+	cloud.google.com/go/bigquery v1.8.0
 	cloud.google.com/go/firestore v1.6.1
 	github.com/bwmarrin/discordgo v0.24.0
 	github.com/gorilla/mux v1.8.0
