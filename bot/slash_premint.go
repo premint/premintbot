@@ -49,6 +49,22 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 
 		if resp.Registered {
 			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
+			roleSet := false
+			for _, role := range i.Interaction.Member.Roles {
+				if role == p.Config.PremintRoleID {
+					roleSet = true
+					break
+				}
+			}
+
+			if p.Config.PremintRoleID != "" && !roleSet {
+				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, p.Config.PremintRoleID)
+				if err != nil {
+					logger.Errorw("Failed to add premint role", "guild", i.GuildID, "error", err)
+					return
+				}
+			}
+
 		} else {
 			message = fmt.Sprintf("❌ Wallet %s is not registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 		}
