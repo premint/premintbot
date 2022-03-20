@@ -17,6 +17,7 @@ Never commit or share credentials.json.
 Make sure env variables are set in `~/.zprofile`:
 
 ```sh
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/credentials.json"
 export PREMINTBOT_DISCORDAUTHTOKEN="REDACTED"
 export PREMINTBOT_GOOGLECLOUDPROJECT="premint-343516"
 ```
@@ -68,10 +69,11 @@ Cloud Scheduler link, runs every 5 min: https://console.cloud.google.com/cloudsc
 ## Slash Commands
 
 - `/premint` - Check if a user is in the Premint list
+- `/premint <ETH wallet address>` - Check if a user is in the Premint list
 
-## Legacy Commands
+## Bang Commands
 
-- `!help` - Help
-- `!setup` - Check setup status
-- `!set-premint` - Set Premint API key
-- `!nuke` - Delete all channels & roles
+- `!premint` - Help
+- `!premint-setup` - Check setup status
+- `!premint-set-api-key <Premint API key>` - Set Premint API key
+- `!premint-nuke` - Delete all channels & roles

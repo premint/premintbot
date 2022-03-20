@@ -7,7 +7,6 @@ require (
 	github.com/bwmarrin/discordgo v0.24.0
 	github.com/gorilla/mux v1.8.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/kr/pretty v0.1.0
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/fx v1.16.0
 	go.uber.org/zap v1.19.1

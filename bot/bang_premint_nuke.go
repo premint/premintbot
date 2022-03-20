@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func nukeCommand(
+func premintNukeCommand(
 	ctx context.Context,
 	logger *zap.SugaredLogger,
 	database *firestore.Client,
@@ -38,7 +38,7 @@ func nukeCommand(
 
 	// Delete roles
 	for _, role := range g.Roles {
-		if role.Name == "premintbot" {
+		if role.Name == "Premintbot" {
 			s.GuildRoleDelete(g.ID, role.ID)
 			logger.Infow("Deleted role", zap.String("role", role.Name))
 		}

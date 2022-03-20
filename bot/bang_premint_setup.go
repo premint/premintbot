@@ -9,7 +9,7 @@ import (
 	// "github.com/kyokomi/emoji/v2"
 )
 
-func setupCommand(
+func premintSetupCommand(
 	ctx context.Context,
 	logger *zap.SugaredLogger,
 	database *firestore.Client,
@@ -24,25 +24,46 @@ func setupCommand(
 
 	// TODO: Make sure they have the admin role
 
-	completed := false
-	msg := "```\n"
-	msg += "Here are the bot settings:\n\n"
+	apiKeySet := p.config.PremintAPIKey != ""
+	roleSet := p.config.PremintRoleID != "" && p.config.PremintRoleName != ""
+	completed := apiKeySet && roleSet
 
-	// Check if the guild is already setup
-	if p.config.PremintAPIKey != "" {
-		completed = true
-		msg += "✅ Connected to project API Key: `" + p.config.PremintAPIKey + "`\n"
+	// Check if the Premint API key is set
+	apiKeyField := &discordgo.MessageEmbedField{}
+	if apiKeySet {
+		apiKeyField.Name = "✅ Connected project API Key"
+		apiKeyField.Value = "`" + p.config.PremintAPIKey + "`"
 	} else {
-		msg += "❌ Your Premint project is not connected, run !premint-set-api-key <API Key> to update it.\n"
+		apiKeyField.Name = "❌ Missing project API Key"
+		apiKeyField.Value = "Use `!premint-set-api-key <API Key>` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API."
 	}
 
-	if completed {
-		msg += "\n✅ Your guild is setup!\n"
+	// Check if the role is set
+	roleField := &discordgo.MessageEmbedField{}
+	if roleSet {
+		roleField.Name = "✅ Role is set"
+		roleField.Value = "`" + p.config.PremintRoleName + "`"
 	} else {
-		msg += "\nComplete the steps above.\n"
+		roleField.Name = "❌ Role is not set"
+		roleField.Value = "Use `!premint-set-role <Role ID>` to set it. You can find your role ID but right clicking it > Copy ID."
 	}
 
-	msg += "```"
+	fields := []*discordgo.MessageEmbedField{apiKeyField, roleField}
+	s.ChannelMessageSendEmbed(m.ChannelID, createSetupEmbed(fields, completed))
+}
 
-	s.ChannelMessageSend(m.ChannelID, msg)
+func createSetupEmbed(fields []*discordgo.MessageEmbedField, completed bool) *discordgo.MessageEmbed {
+	color := 0x00ff00
+	description := "Your guild is setup!"
+	if !completed {
+		color = 0xff0000
+		description = "Complete the steps below."
+	}
+	return &discordgo.MessageEmbed{
+		Type:        "",
+		Title:       "Premint Setup",
+		Description: description,
+		Color:       color,
+		Fields:      fields,
+	}
 }

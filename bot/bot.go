@@ -88,13 +88,13 @@ func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *fir
 		}
 
 		// Admin commands
-		nukeCommand(ctx, logger, database, s, m)
-		setupCommand(ctx, logger, database, s, m)
-		setPremintCommand(ctx, logger, database, s, m)
-		setRoleCommand(ctx, logger, database, s, m)
+		premintNukeCommand(ctx, logger, database, s, m)
+		premintSetupCommand(ctx, logger, database, s, m)
+		premintSetAPIKeyCommand(ctx, logger, database, s, m)
+		premintSetRoleCommand(ctx, logger, database, s, m)
 
 		// Public commands
-		helpCommand(ctx, logger, database, s, m)
+		premintCommand(ctx, logger, database, s, m)
 	}
 }
 

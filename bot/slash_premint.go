@@ -6,7 +6,6 @@ import (
 
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
-	"github.com/kr/pretty"
 	"github.com/mager/premintbot/premint"
 	"go.uber.org/zap"
 )
@@ -19,7 +18,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Premint API key is not set. Please use `!set-premint` command to set it.",
+					Content: "Premint API key is not set. Please use `!premint-set-api-key <Premint API key>` command to set it.",
 				},
 			})
 			return
@@ -29,9 +28,9 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		var message string
 		cmdData := i.ApplicationCommandData()
 
-		pretty.Print(cmdData)
 		resp := premint.CheckPremintStatusResp{}
 		if cmdData.Options == nil {
+			logger.Info("Checking premint status with the Discord user ID")
 			resp, err = premint.CheckPremintStatusForUser(p.config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
@@ -39,6 +38,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			}
 		} else {
 			// TODO: Validate ETH address
+			logger.Info("Checking premint status with the ETH wallet address")
 			address := i.ApplicationCommandData().Options[0].StringValue()
 			resp, err = premint.CheckPremintStatusForAddress(p.config.PremintAPIKey, address)
 			if err != nil {
@@ -57,7 +57,10 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: message,
+				// Ephemeral = this message is only visible to the user who invoked the Interaction,
+				Flags: 64,
 			},
 		})
+
 	}
 }

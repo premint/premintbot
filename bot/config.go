@@ -16,13 +16,14 @@ type Guild struct {
 	OwnerID string `firestore:"owner-id"`
 
 	// GuildID is the ID of the guild
-	GuildID   string `firestore:"guild-id"`
-	GuildName string `firestore:"guild-name"`
+	GuildID          string `firestore:"guild-id"`
+	GuildName        string `firestore:"guild-name"`
+	GuildAdminRoleID string `firestore:"guild-admin-role-id"`
 
 	// Premint settings
-	PremintAPIKey string `firestore:"premint-api-key"`
-	PremintRole   string `firestore:"premint-role"`
-	PremintRoleID string `firestore:"premint-role-id"`
+	PremintAPIKey   string `firestore:"premint-api-key"`
+	PremintRoleID   string `firestore:"premint-role-id"`
+	PremintRoleName string `firestore:"premint-role-name"`
 }
 
 type ConfigParams struct {
