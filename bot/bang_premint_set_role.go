@@ -18,11 +18,11 @@ func premintSetRoleCommand(
 	m *discordgo.MessageCreate,
 ) {
 	if m.Content == "!premint-set-role" {
-		s.ChannelMessageSend(m.ChannelID, "Missing role. Please use `!premint-set-role <role name>` to set it. You can find your role ID by right-clicking on the role > Copy ID.")
+		s.ChannelMessageSend(m.ChannelID, "Missing role. Please use `!premint-set-role <Role ID>` to set it. You can find your role ID by right-clicking on the role > Copy ID.")
 		return
 	}
 
-	// Regex match !premint-set-role <API Key>
+	// Regex match !premint-set-role <Role ID>
 	re := regexp.MustCompile(`^!premint-set-role (.*)$`)
 	match := re.FindStringSubmatch(m.Content)
 
