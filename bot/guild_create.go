@@ -62,7 +62,26 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			return
 		}
 
-		// Add owner to role
+		// Add audit log users to admin role
+		auditLog, err := s.GuildAuditLog(guildID, "", "", 28, 0)
+		if err != nil {
+			logger.Errorw("Failed to get audit log", "guild", g.Guild.ID, "error", err)
+			return
+		}
+
+		auditLogUserIDs := make([]string, 0)
+		for _, entry := range auditLog.Users {
+			auditLogUserIDs = append(auditLogUserIDs, entry.ID)
+		}
+		for _, userID := range auditLogUserIDs {
+			err = s.GuildMemberRoleAdd(g.Guild.ID, userID, role.ID)
+			if err != nil {
+				logger.Errorw("Failed to add user to role", "guild", g.Guild.ID, "user", userID, "error", err)
+				return
+			}
+		}
+
+		// Add role to owner, just in case
 		err = s.GuildMemberRoleAdd(g.Guild.ID, ownerID, role.ID)
 		if err != nil {
 			logger.Errorw("Failed to add owner to role", "guild", g.Guild.ID, "error", err)

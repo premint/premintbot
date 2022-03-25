@@ -56,9 +56,6 @@ func Start(
 	// Register the guildCreate func as a callback for GuildCreate events.
 	dg.AddHandler(guildCreate(ctx, logger, database, bqClient))
 
-	// https://github.com/bwmarrin/discordgo/blob/v0.23.2/structs.go#L1295
-	// dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds
-
 	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
@@ -71,6 +68,14 @@ func Start(
 	if wsErr != nil {
 		fmt.Println("error opening connection,", wsErr)
 	}
+
+	// DEBUGGING
+	// Register the auditLogChange func as a callback for auditLog events.
+	// dg.AddHandler(auditLogChange(ctx, logger, database, bqClient))
+	// Register the auditLogUpdate func as a callback for auditLog events.
+	// dg.AddHandler(auditLogUpdate(ctx, logger, database, bqClient))
+	// https://github.com/bwmarrin/discordgo/blob/v0.23.2/structs.go#L1295
+	// dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds
 
 	// Wait here until CTRL-C or other term signal is received.
 	// fmt.Println("Bot is now running. Press CTRL-C to exit.")
