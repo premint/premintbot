@@ -3,22 +3,26 @@ package bot
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
+	bq "github.com/mager/premintbot/bigquery"
 	"github.com/mager/premintbot/premint"
 	"go.uber.org/zap"
 )
 
-func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient, bqClient *bigquery.Client) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
 		p := GetConfig(ctx, logger, database, i.GuildID)
 
 		if p.Config.PremintAPIKey == "" {
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Premint API key is not set. Please use `!premint-set-api-key <Premint API key>` command to set it.",
+					Content: "Premint API key is not set. Please ask an admin to run the `!premint-set-api-key <Premint API key>` command to set it.",
 				},
 			})
 			return
@@ -29,6 +33,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		cmdData := i.ApplicationCommandData()
 
 		resp := premint.CheckPremintStatusResp{}
+		withAddress := false
 		if cmdData.Options == nil {
 			logger.Info("Checking premint status with the Discord user ID")
 			resp, err = premint.CheckPremintStatusForUser(p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
@@ -38,6 +43,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			}
 		} else {
 			// TODO: Validate ETH address
+			withAddress = true
 			logger.Info("Checking premint status with the ETH wallet address")
 			address := i.ApplicationCommandData().Options[0].StringValue()
 			resp, err = premint.CheckPremintStatusForAddress(p.Config.PremintAPIKey, address)
@@ -46,6 +52,15 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				return
 			}
 		}
+
+		evt := &bq.BQSlashPremint{
+			GuildID:     i.GuildID,
+			UserID:      i.Interaction.Member.User.ID,
+			WithAddress: withAddress,
+			Registered:  resp.Registered,
+			SentAt:      time.Now(),
+		}
+		bq.RecordSlashPremint(bqClient, evt)
 
 		if resp.Registered {
 			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
@@ -64,7 +79,6 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 					return
 				}
 			}
-
 		} else {
 			message = fmt.Sprintf("❌ Wallet %s is not registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 		}

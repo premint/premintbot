@@ -17,6 +17,14 @@ type BQGuildsCreate struct {
 	JoinedAt         time.Time
 }
 
+type BQSlashPremint struct {
+	GuildID     string
+	UserID      string
+	Registered  bool
+	WithAddress bool
+	SentAt      time.Time
+}
+
 var projectID = "premint-343516"
 
 // ProvideBQ provides a bigquery client
@@ -39,6 +47,21 @@ func RecordGuildsCreate(
 		table = bq.DatasetInProject(projectID, "guilds").Table("create")
 		u     = table.Inserter()
 		items = []*BQGuildsCreate{evt}
+	)
+	if err := u.Put(ctx, items); err != nil {
+		log.Fatalf("Failed to insert: %v", err)
+	}
+}
+
+func RecordSlashPremint(
+	bq *bigquery.Client,
+	evt *BQSlashPremint,
+) {
+	var (
+		ctx   = context.Background()
+		table = bq.DatasetInProject(projectID, "commands").Table("slash_premint")
+		u     = table.Inserter()
+		items = []*BQSlashPremint{evt}
 	)
 	if err := u.Put(ctx, items); err != nil {
 		log.Fatalf("Failed to insert: %v", err)

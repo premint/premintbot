@@ -31,17 +31,15 @@ func premintSetAPIKeyCommand(
 	}
 
 	p := GetConfig(ctx, logger, database, m.GuildID)
-	apiKey := match[1]
 
-	// Make sure the user has the Premintbot role: loop through their roles and make sure they have the guild admin role.
-	for _, r := range m.Member.Roles {
-		if r == p.Config.GuildAdminRoleID {
-			p.doc.Ref.Update(ctx, []firestore.Update{
-				{Path: "premint-api-key", Value: apiKey},
-			})
-			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint API key updated: %s", match[1]))
-			return
-		}
+	if !isAdmin(p, m.Author) {
+		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
+		return
 	}
-	s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
+
+	apiKey := match[1]
+	p.doc.Ref.Update(ctx, []firestore.Update{
+		{Path: "premint-api-key", Value: apiKey},
+	})
+	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint API key updated: %s", match[1]))
 }

@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	appID = "950933570564800552"
+	testAppID = "952680307881041960"
+	appID     = "950933570564800552"
 	// /premint slash command
 	premintCmd = &discordgo.ApplicationCommand{
 		Name:        "premint",
@@ -47,8 +48,8 @@ func Start(
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient))
-	dg.ApplicationCommandCreate(appID, "", premintCmd)
+	dg.ApplicationCommandCreate(testAppID, "", premintCmd)
+	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient, bqClient))
 
 	// Open a websocket connection to Discord and begin listening.
 	wsErr := dg.Open()
@@ -94,9 +95,9 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 }
 
 // isAdmin checks if the user is an admin
-func isAdmin(p *ConfigParams, a discordgo.Member) bool {
+func isAdmin(p *ConfigParams, u *discordgo.User) bool {
 	for _, admin := range p.Config.GuildAdmins {
-		if admin == a.User.ID {
+		if admin == u.ID {
 			return true
 		}
 	}

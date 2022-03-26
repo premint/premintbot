@@ -32,21 +32,30 @@ func premintSetRoleCommand(
 
 	p := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
+
+	if !isAdmin(p, m.Author) {
+		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
+		return
+	}
+
 	roleID := match[1]
+	roleName := ""
+
+	for _, role := range g.Roles {
+		if role.ID == roleID {
+			roleName = role.Name
+		}
+	}
 
 	// Make sure the user has the Premintbot role: loop through their roles and make sure they have the guild admin role.
-	for _, r := range m.Member.Roles {
-		if r == p.Config.GuildAdminRoleID {
-			for _, role := range g.Roles {
-				if role.ID == roleID {
-					p.doc.Ref.Update(ctx, []firestore.Update{
-						{Path: "premint-role-id", Value: roleID},
-						{Path: "premint-role-name", Value: role.Name},
-					})
-					s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint role updated: %s", role.Name))
-					return
-				}
-			}
+	for _, admin := range p.Config.GuildAdmins {
+		if admin == m.Author.ID {
+			p.doc.Ref.Update(ctx, []firestore.Update{
+				{Path: "premint-role-id", Value: roleID},
+				{Path: "premint-role-name", Value: roleName},
+			})
+			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint role updated: %s", roleName))
+			return
 		}
 	}
 
