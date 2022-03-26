@@ -17,11 +17,13 @@ var premintCategoryName = "premint"
 // guildCreate is a function that is called when the bot joins a guild.
 func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, bqClient *bigquery.Client) func(s *discordgo.Session, g *discordgo.GuildCreate) {
 	return func(s *discordgo.Session, g *discordgo.GuildCreate) {
-		ownerID := g.Guild.OwnerID
-		guildID := g.Guild.ID
-		guildName := g.Guild.Name
+		var (
+			ownerID   = g.Guild.OwnerID
+			guildID   = g.Guild.ID
+			guildName = g.Guild.Name
+		)
 
-		// Return early if the portal channel category exists
+		// Return early if the premint channel category exists
 		for _, category := range g.Guild.Channels {
 			if category.Name == premintCategoryName {
 				logger.Infow("Premint category already exists", zap.String("guild", guildID), zap.String("guild", guildName))
@@ -62,33 +64,32 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			return
 		}
 
-		// Add audit log users to admin role
+		// Fetch list of non-bot users in the audit log and add them as admins
 		auditLog, err := s.GuildAuditLog(guildID, "", "", 28, 0)
 		if err != nil {
 			logger.Errorw("Failed to get audit log", "guild", g.Guild.ID, "error", err)
 			return
 		}
-
-		auditLogUserIDs := make([]string, 0)
+		guildAdmins := make([]string, 0)
 		for _, entry := range auditLog.Users {
-			auditLogUserIDs = append(auditLogUserIDs, entry.ID)
+			if !entry.Bot {
+				guildAdmins = append(guildAdmins, entry.ID)
+			}
 		}
-		for _, userID := range auditLogUserIDs {
+		for _, userID := range guildAdmins {
 			err = s.GuildMemberRoleAdd(g.Guild.ID, userID, role.ID)
 			if err != nil {
 				logger.Errorw("Failed to add user to role", "guild", g.Guild.ID, "user", userID, "error", err)
-				return
 			}
 		}
 
 		// Add role to owner, just in case
 		err = s.GuildMemberRoleAdd(g.Guild.ID, ownerID, role.ID)
 		if err != nil {
-			logger.Errorw("Failed to add owner to role", "guild", g.Guild.ID, "error", err)
-			return
+			logger.Errorw("Failed to add owner to role", "guild", g.Guild.ID, "ownerID", ownerID, "error", err)
 		}
 
-		// Create Portal group
+		// Create Premint group
 		permissionOverwrites := []*discordgo.PermissionOverwrite{
 			// Allow for role
 			{
@@ -115,7 +116,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			logger.Errorf("Failed to create channel: %v", err)
 		}
 
-		// Create #portal-config channel
+		// Create #premint-config channel
 		c, err := s.GuildChannelCreateComplex(
 			g.Guild.ID,
 			discordgo.GuildChannelCreateData{
@@ -136,17 +137,27 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			GuildID:          g.Guild.ID,
 			GuildName:        g.Guild.Name,
 			GuildAdminRoleID: role.ID,
-			OwnerID:          ownerID,
+			GuildOwnerID:     ownerID,
 			JoinedAt:         joinedAt,
+			GuildAdmins:      guildAdmins,
 		}
 
 		_, err = database.Collection("guilds").Doc(g.Guild.ID).Set(ctx, guild)
 		if err != nil {
 			logger.Errorf("Failed to create guild in Firestore: %v", err)
 		}
-		logger.Info("Guild updated in database")
+		logger.Infow("Guild updated in database", zap.String("guild", guildID), zap.String("guild", guildName))
 
-		bq.RecordGuildsCreate(bqClient, g.Guild.ID, g.Guild.Name, role.ID, ownerID, joinedAt)
+		// Send an event to BigQuery
+		evt := &bq.BQGuildsCreate{
+			GuildID:          g.Guild.ID,
+			GuildName:        g.Guild.Name,
+			GuildAdminRoleID: role.ID,
+			OwnerID:          ownerID,
+			JoinedAt:         joinedAt,
+			GuildAdmins:      guildAdmins,
+		}
+		bq.RecordGuildsCreate(bqClient, evt)
 
 		s.ChannelMessageSendEmbed(c.ID, createGeneralEmbed())
 	}

@@ -45,7 +45,6 @@ func Register(
 	router *mux.Router,
 	premintClient *premint.PremintClient,
 ) {
-
 	// Setup Discord Bot
 	token := fmt.Sprintf("Bot %s", cfg.DiscordAuthToken)
 	dg, err := discordgo.New(token)

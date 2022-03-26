@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	appID                 = "950933570564800552"
-	integerOptionMinValue = 1.0
-	premintCmd            = &discordgo.ApplicationCommand{
+	appID = "950933570564800552"
+	// /premint slash command
+	premintCmd = &discordgo.ApplicationCommand{
 		Name:        "premint",
 		Description: "Check if your address is registered with Premint",
 		Options: []*discordgo.ApplicationCommandOption{
@@ -23,18 +23,6 @@ var (
 				Name:        "address",
 				Description: "Your ETH address",
 				Required:    false,
-			},
-		},
-	}
-	setupPremintCmd = &discordgo.ApplicationCommand{
-		Name:        "setup-premint",
-		Description: "Add your Premint API key to the bot",
-		Options: []*discordgo.ApplicationCommandOption{
-			{
-				Type:        discordgo.ApplicationCommandOptionString,
-				Name:        "API Key",
-				Description: "Your Premint API key",
-				Required:    true,
 			},
 		},
 	}
@@ -48,7 +36,6 @@ func Start(
 	bqClient *bigquery.Client,
 ) {
 	ctx := context.Background()
-	logger.Info("Registering Discord bot")
 
 	// Register the messageCreate func as a callback for MessageCreate events.
 	dg.AddHandler(messageCreate(ctx, logger, database, premintClient))
@@ -74,17 +61,6 @@ func Start(
 	// dg.AddHandler(auditLogChange(ctx, logger, database, bqClient))
 	// Register the auditLogUpdate func as a callback for auditLog events.
 	// dg.AddHandler(auditLogUpdate(ctx, logger, database, bqClient))
-	// https://github.com/bwmarrin/discordgo/blob/v0.23.2/structs.go#L1295
-	// dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds
-
-	// Wait here until CTRL-C or other term signal is received.
-	// fmt.Println("Bot is now running. Press CTRL-C to exit.")
-	// sc := make(chan os.Signal, 1)
-	// signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	// <-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
 }
 
 func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -117,6 +93,13 @@ func getGuildFromMessage(s *discordgo.Session, m *discordgo.MessageCreate) *disc
 	return guild
 }
 
+// isAdmin checks if the user is an admin
 func isAdmin(p *ConfigParams, a discordgo.Member) bool {
+	for _, admin := range p.Config.GuildAdmins {
+		if admin == a.User.ID {
+			return true
+		}
+	}
+
 	return false
 }

@@ -12,17 +12,22 @@ type Guild struct {
 	Active   bool      `firestore:"active"`
 	JoinedAt time.Time `firestore:"joined-at"`
 
-	// The person who owns the Discord
-	OwnerID string `firestore:"owner-id"`
-
+	// GuildOwnerID is the person who owns the Discord guild
+	GuildOwnerID string `firestore:"owner-id"`
 	// GuildID is the ID of the guild
-	GuildID          string `firestore:"guild-id"`
-	GuildName        string `firestore:"guild-name"`
+	GuildID   string `firestore:"guild-id"`
+	GuildName string `firestore:"guild-name"`
+	// GuildAdminRoleID is the Premintbot role ID
 	GuildAdminRoleID string `firestore:"guild-admin-role-id"`
+	// GuildAdmins is a list of users who were in the audit log when the bot joined the guild
+	GuildAdmins []string `firestore:"guild-admins"`
 
-	// Premint settings
-	PremintAPIKey   string `firestore:"premint-api-key"`
-	PremintRoleID   string `firestore:"premint-role-id"`
+	// PREMINT settings
+	// PremintAPIKey is the API key for the user's Premint project
+	PremintAPIKey string `firestore:"premint-api-key"`
+	// PremintRoleName is the ID of the role that is given to users who have registered for Premint
+	PremintRoleID string `firestore:"premint-role-id"`
+	// PremintRoleName is the name of the role that is given to users who have registered for Premint
 	PremintRoleName string `firestore:"premint-role-name"`
 }
 
