@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -15,7 +16,6 @@ import (
 
 func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient, bqClient *bigquery.Client) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-
 		p := GetConfig(ctx, logger, database, i.GuildID)
 
 		if p.Config.PremintAPIKey == "" {
@@ -36,7 +36,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		withAddress := false
 		if cmdData.Options == nil {
 			logger.Info("Checking premint status with the Discord user ID")
-			resp, err = premint.CheckPremintStatusForUser(p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
+			resp, err = premint.CheckPremintStatusForUser(logger, p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return
@@ -45,8 +45,8 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			// TODO: Validate ETH address
 			withAddress = true
 			logger.Info("Checking premint status with the ETH wallet address")
-			address := i.ApplicationCommandData().Options[0].StringValue()
-			resp, err = premint.CheckPremintStatusForAddress(p.Config.PremintAPIKey, address)
+			address := strings.ToLower(i.ApplicationCommandData().Options[0].StringValue())
+			resp, err = premint.CheckPremintStatusForAddress(logger, p.Config.PremintAPIKey, address)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return

@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.1.0
+	github.com/magiclabs/magic-admin-go v0.1.0
 	github.com/pkg/errors v0.9.1 // indirect
 	go.uber.org/fx v1.16.0
 	go.uber.org/zap v1.19.1
