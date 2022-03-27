@@ -35,7 +35,7 @@ func premintSetupCommand(
 		apiKeyField.Value = "`" + p.Config.PremintAPIKey + "`"
 	} else {
 		apiKeyField.Name = "❌ Missing project API Key"
-		apiKeyField.Value = "Use `!premint-set-api-key <API Key>` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API."
+		apiKeyField.Value = "Use `!premint-set-api-key <API Key>` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings > API."
 	}
 
 	// Check if the role is set
@@ -45,7 +45,7 @@ func premintSetupCommand(
 		roleField.Value = "`" + p.Config.PremintRoleName + "`"
 	} else {
 		roleField.Name = "❌ Role is not set"
-		roleField.Value = "Use `!premint-set-role <Role ID>` to set it. You can find your role ID but right clicking it > Copy ID."
+		roleField.Value = "Use `!premint-set-role <Discord role ID>` to set it. Create a role that you want your users to get when they use the `/premint` command. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID."
 	}
 
 	fields := []*discordgo.MessageEmbedField{apiKeyField, roleField}

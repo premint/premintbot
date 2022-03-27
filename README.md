@@ -2,6 +2,23 @@
 
 A Discord bot for Premint.
 
+## Endpoints
+
+- `GET /health` - Health check endpoint, used to keep the bot alive
+
+## Slash Commands
+
+- `/premint` - Check if a user is in the Premint list
+- `/premint <ETH wallet address>` - Check if a user is in the Premint list
+
+## Bang Commands
+
+- `!premint` - Help
+- `!premint-setup` - Check setup status
+- `!premint-set-api-key <Premint API key>` - Set Premint API key
+- `!premint-set-role <Discord role ID>` - Set Discord role ID
+- `!premint-nuke` - Delete all channels & roles
+
 ## How to run locally
 
 Setup gcloud credentials (only need to do this once):
@@ -62,18 +79,45 @@ https://console.cloud.google.com/firestore/data/guilds?referrer=search&project=p
 
 Cloud Scheduler link, runs every 5 min: https://console.cloud.google.com/cloudscheduler?project=premint-343516
 
-## Endpoints
+## BigQuery Events
 
-- `GET /health` - Health check endpoint, used to keep the bot alive
+These events are used for debugging:
 
-## Slash Commands
+### `guilds.create`
 
-- `/premint` - Check if a user is in the Premint list
-- `/premint <ETH wallet address>` - Check if a user is in the Premint list
+When a bot joins the server
 
-## Bang Commands
+| Field              | Type        |
+| ------------------ | ----------- |
+| `GuildID`          | `string`    |
+| `GuildName`        | `string`    |
+| `GuildAdminRoleID` | `string`    |
+| `OwnerID`          | `string`    |
+| `GuildAdmins`      | `[]string`  |
+| `Message`          | `string`    |
+| `Timestamp`        | `time.Time` |
+| `UserID`           | `string`    |
 
-- `!premint` - Help
-- `!premint-setup` - Check setup status
-- `!premint-set-api-key <Premint API key>` - Set Premint API key
-- `!premint-nuke` - Delete all channels & roles
+### `guilds.admin_action`
+
+When an admin performs an action
+
+| Field        | Type        |
+| ------------ | ----------- |
+| `GuildID`    | `string`    |
+| `UserID`     | `string`    |
+| `Timestamp`  | `time.Time` |
+| `ActionType` | `string`    |
+| `Message`    | `string`    |
+
+### `commands.slash_premint`
+
+When an admin performs an event
+
+| Field         | Type        |
+| ------------- | ----------- |
+| `GuildID`     | `string`    |
+| `UserID`      | `string`    |
+| `Timestamp`   | `time.Time` |
+| `Registered`  | `boolean`   |
+| `WithAddress` | `boolean`   |

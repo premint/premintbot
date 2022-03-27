@@ -80,7 +80,11 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				}
 			}
 		} else {
-			message = fmt.Sprintf("❌ Wallet %s is not registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
+			if withAddress {
+				message = fmt.Sprintf("❌ Wallet %s is not registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
+			} else {
+				message = fmt.Sprintf("❌ User %s is not registered on the %s list. %s", i.Interaction.Member.User.Username, resp.ProjectName, resp.ProjectURL)
+			}
 		}
 
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

@@ -39,7 +39,7 @@ func Start(
 	ctx := context.Background()
 
 	// Register the messageCreate func as a callback for MessageCreate events.
-	dg.AddHandler(messageCreate(ctx, logger, database, premintClient))
+	dg.AddHandler(messageCreate(ctx, logger, database, premintClient, bqClient))
 
 	// Register the guildCreate func as a callback for GuildCreate events.
 	dg.AddHandler(guildCreate(ctx, logger, database, bqClient))
@@ -64,7 +64,7 @@ func Start(
 	// dg.AddHandler(auditLogUpdate(ctx, logger, database, bqClient))
 }
 
-func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient) func(s *discordgo.Session, m *discordgo.MessageCreate) {
+func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient, bqClient *bigquery.Client) func(s *discordgo.Session, m *discordgo.MessageCreate) {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Ignore all messages created by the bot itself
 		// This isn't required in this specific example but it's a good practice.
@@ -75,8 +75,8 @@ func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *fir
 		// Admin commands
 		premintNukeCommand(ctx, logger, database, s, m)
 		premintSetupCommand(ctx, logger, database, s, m)
-		premintSetAPIKeyCommand(ctx, logger, database, s, m)
-		premintSetRoleCommand(ctx, logger, database, s, m)
+		premintSetAPIKeyCommand(ctx, logger, database, bqClient, s, m)
+		premintSetRoleCommand(ctx, logger, database, bqClient, s, m)
 
 		// Public commands
 		premintCommand(ctx, logger, database, s, m)

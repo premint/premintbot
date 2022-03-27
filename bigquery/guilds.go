@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/bwmarrin/discordgo"
 )
 
 type BQGuildsCreate struct {
@@ -18,12 +19,12 @@ type BQGuildsCreate struct {
 	OwnerID          string
 }
 
-type BQAdminErrors struct {
-	GuildID      string
-	UserID       string
-	Timestamp    time.Time
-	ActionType   string
-	ErrorMessage string
+type BQAdminAction struct {
+	GuildID    string
+	UserID     string
+	Timestamp  time.Time
+	ActionType string
+	Message    string
 }
 
 func RecordGuildsCreate(
@@ -41,15 +42,24 @@ func RecordGuildsCreate(
 	}
 }
 
-func RecordAdminErrors(
+func RecordAdminAction(
 	bq *bigquery.Client,
-	evt *BQAdminErrors,
+	m *discordgo.MessageCreate,
+	actionType, msg string,
 ) {
 	var (
 		ctx   = context.Background()
-		table = bq.DatasetInProject(projectID, "guilds").Table("admin_errors")
+		table = bq.DatasetInProject(projectID, "guilds").Table("admin_actions")
 		u     = table.Inserter()
-		items = []*BQAdminErrors{evt}
+		items = []*BQAdminAction{
+			{
+				GuildID:    m.GuildID,
+				UserID:     m.Author.ID,
+				Timestamp:  time.Now(),
+				ActionType: actionType,
+				Message:    msg,
+			},
+		}
 	)
 	if err := u.Put(ctx, items); err != nil {
 		log.Fatalf("Failed to insert: %v", err)
