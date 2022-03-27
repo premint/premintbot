@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	testAppID = "952680307881041960"
-	appID     = "950933570564800552"
+	// testAppID = "952680307881041960"
+	appID = "950933570564800552"
 	// /premint slash command
 	premintCmd = &discordgo.ApplicationCommand{
 		Name:        "premint",
@@ -48,7 +48,7 @@ func Start(
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	dg.ApplicationCommandCreate(testAppID, "", premintCmd)
+	dg.ApplicationCommandCreate(appID, "", premintCmd)
 	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient, bqClient))
 
 	// Open a websocket connection to Discord and begin listening.
