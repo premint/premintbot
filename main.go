@@ -10,12 +10,14 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/gorilla/mux"
 	bq "github.com/mager/premintbot/bigquery"
+	magicClient "github.com/magiclabs/magic-admin-go/client"
 
 	"github.com/mager/premintbot/bot"
 	"github.com/mager/premintbot/config"
 	"github.com/mager/premintbot/database"
 	"github.com/mager/premintbot/handler"
 	"github.com/mager/premintbot/logger"
+	"github.com/mager/premintbot/magic"
 	"github.com/mager/premintbot/premint"
 	"github.com/mager/premintbot/router"
 	"go.uber.org/fx"
@@ -29,8 +31,9 @@ func main() {
 			config.Options,
 			database.Options,
 			logger.Options,
-			router.Options,
+			magic.Options,
 			premint.Options,
+			router.Options,
 		),
 		fx.Invoke(Register),
 	).Run()
@@ -42,8 +45,9 @@ func Register(
 	cfg config.Config,
 	database *firestore.Client,
 	logger *zap.SugaredLogger,
-	router *mux.Router,
+	magic *magicClient.API,
 	premintClient *premint.PremintClient,
+	router *mux.Router,
 ) {
 	// Setup Discord Bot
 	token := fmt.Sprintf("Bot %s", cfg.DiscordAuthToken)
@@ -51,7 +55,10 @@ func Register(
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
+
+	// Start the bot
 	bot.Start(dg, logger, database, premintClient, bqClient)
+
 	// Route handler
 	handler.New(logger, router, database, dg)
 

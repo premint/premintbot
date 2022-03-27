@@ -42,8 +42,8 @@ func New(
 func (h *Handler) registerRoutes() {
 	h.router.HandleFunc("/health", h.health).
 		Methods("GET")
+	// h.router.HandleFunc("/guilds", h.getGuilds).
+	// 	Methods("GET")
 	h.router.HandleFunc("/debug", h.debug).
-		Methods("POST")
-	h.router.HandleFunc("/assign_role", h.assignRole).
 		Methods("POST")
 }

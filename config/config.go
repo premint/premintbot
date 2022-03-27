@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	DiscordAuthToken   string
+	MagicSecretKey     string
 	GoogleCloudProject string
 }
 
