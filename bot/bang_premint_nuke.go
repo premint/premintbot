@@ -30,7 +30,7 @@ func premintNukeCommand(
 
 	// Delete channels
 	for _, channel := range g.Channels {
-		if channel.Name == "premint-config" || channel.Name == "premint" {
+		if channel.Name == premintConfigChannelName || channel.Name == premintCategoryName {
 			s.ChannelDelete(channel.ID)
 			logger.Infow("Deleted channel", zap.String("channel", channel.Name))
 		}

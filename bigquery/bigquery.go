@@ -3,28 +3,11 @@ package bigquery
 import (
 	"context"
 	"log"
-	"time"
 
 	"cloud.google.com/go/bigquery"
 )
 
-type BQGuildsCreate struct {
-	GuildID          string
-	GuildName        string
-	GuildAdminRoleID string
-	GuildAdmins      []string
-	OwnerID          string
-	JoinedAt         time.Time
-}
-
-type BQSlashPremint struct {
-	GuildID     string
-	UserID      string
-	Registered  bool
-	WithAddress bool
-	SentAt      time.Time
-}
-
+// TODO: Move to config
 var projectID = "premint-343516"
 
 // ProvideBQ provides a bigquery client
@@ -37,33 +20,3 @@ func ProvideBQ() *bigquery.Client {
 }
 
 var Options = ProvideBQ
-
-func RecordGuildsCreate(
-	bq *bigquery.Client,
-	evt *BQGuildsCreate,
-) {
-	var (
-		ctx   = context.Background()
-		table = bq.DatasetInProject(projectID, "guilds").Table("create")
-		u     = table.Inserter()
-		items = []*BQGuildsCreate{evt}
-	)
-	if err := u.Put(ctx, items); err != nil {
-		log.Fatalf("Failed to insert: %v", err)
-	}
-}
-
-func RecordSlashPremint(
-	bq *bigquery.Client,
-	evt *BQSlashPremint,
-) {
-	var (
-		ctx   = context.Background()
-		table = bq.DatasetInProject(projectID, "commands").Table("slash_premint")
-		u     = table.Inserter()
-		items = []*BQSlashPremint{evt}
-	)
-	if err := u.Put(ctx, items); err != nil {
-		log.Fatalf("Failed to insert: %v", err)
-	}
-}

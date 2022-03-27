@@ -20,8 +20,17 @@ func premintCommand(
 	}
 
 	p := GetConfig(ctx, logger, database, m.GuildID)
+	g := getGuildFromMessage(s, m)
 
-	if isAdmin(p, m.Author) {
+	// Find #premint-config channel
+	premintConfigChannel := ""
+	for _, channel := range g.Channels {
+		if channel.Name == premintConfigChannelName {
+			premintConfigChannel = channel.ID
+		}
+	}
+
+	if isAdmin(p, m.Author) && m.ChannelID == premintConfigChannel {
 		_, err := s.ChannelMessageSendEmbed(m.ChannelID, CreateAdminHelpEmbed())
 		if err != nil {
 			logger.Errorw("Failed to send help message", "guild", m.GuildID, "error", err)

@@ -56,9 +56,9 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		evt := &bq.BQSlashPremint{
 			GuildID:     i.GuildID,
 			UserID:      i.Interaction.Member.User.ID,
+			Timestamp:   time.Now(),
 			WithAddress: withAddress,
 			Registered:  resp.Registered,
-			SentAt:      time.Now(),
 		}
 		bq.RecordSlashPremint(bqClient, evt)
 

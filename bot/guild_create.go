@@ -12,7 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
-var premintCategoryName = "premint"
+var (
+	premintCategoryName      = "premint"
+	premintConfigChannelName = "premint-config"
+)
 
 // guildCreate is a function that is called when the bot joins a guild.
 func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, bqClient *bigquery.Client) func(s *discordgo.Session, g *discordgo.GuildCreate) {
@@ -121,7 +124,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			g.Guild.ID,
 			discordgo.GuildChannelCreateData{
 				Type:                 discordgo.ChannelTypeGuildText,
-				Name:                 "premint-config",
+				Name:                 premintConfigChannelName,
 				ParentID:             group.ID,
 				PermissionOverwrites: permissionOverwrites,
 			},
@@ -151,10 +154,10 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		// Send an event to BigQuery
 		evt := &bq.BQGuildsCreate{
 			GuildID:          g.Guild.ID,
+			Timestamp:        joinedAt,
 			GuildName:        g.Guild.Name,
 			GuildAdminRoleID: role.ID,
 			OwnerID:          ownerID,
-			JoinedAt:         joinedAt,
 			GuildAdmins:      guildAdmins,
 		}
 		bq.RecordGuildsCreate(bqClient, evt)
