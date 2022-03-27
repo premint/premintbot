@@ -16,6 +16,7 @@ import (
 	"github.com/mager/premintbot/config"
 	"github.com/mager/premintbot/database"
 	"github.com/mager/premintbot/handler"
+	"github.com/mager/premintbot/infura"
 	"github.com/mager/premintbot/logger"
 	"github.com/mager/premintbot/magic"
 	"github.com/mager/premintbot/premint"
@@ -30,6 +31,7 @@ func main() {
 			bq.Options,
 			config.Options,
 			database.Options,
+			infura.Options,
 			logger.Options,
 			magic.Options,
 			premint.Options,
@@ -44,6 +46,7 @@ func Register(
 	bqClient *bigquery.Client,
 	cfg config.Config,
 	database *firestore.Client,
+	infuraClient *infura.InfuraClient,
 	logger *zap.SugaredLogger,
 	magic *magicClient.API,
 	premintClient *premint.PremintClient,
@@ -57,7 +60,7 @@ func Register(
 	}
 
 	// Start the bot
-	bot.Start(dg, logger, database, premintClient, bqClient)
+	bot.Start(cfg, dg, logger, database, premintClient, bqClient, infuraClient)
 
 	// Route handler
 	handler.New(logger, router, database, dg)

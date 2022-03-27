@@ -58,7 +58,7 @@ func CreatePublicHelpEmbed() *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Collector Commands",
-				Value:  "`/premint` - This will check to see if the Discord user is registered on the PREMINT list. If they are, it will return their wallet ID.\n`/premint {ETH wallet address}` - This will check if the wallet address is on the PREMINT list.\n`!premint` - Show this message",
+				Value:  "`/premint` - This will check to see if the Discord user is registered on the PREMINT list. If they are, it will return their wallet ID.\n`/premint {ETH wallet address or ENS name}` - This will check if the wallet address is on the PREMINT list.\n`!premint` - Show this message",
 				Inline: false,
 			},
 			// TODO: Support aliases
@@ -87,12 +87,6 @@ func CreateAdminHelpEmbed() *discordgo.MessageEmbed {
 				Value:  "`!premint-setup` - Show the bot settings\n`!premint-set-api-key {Project API key}` - This connects the bot to a specific PREMINT project. You can find your API Key in the projects Settings > API\n`!premint-set-role <Discord role ID>` - Set the role you want your users to get when they are registered with Premint\n`!premint-nuke` - Delete all channels and set the guild to inactive",
 				Inline: false,
 			},
-			// TODO: Support aliases
-			// {
-			// 	Name:   "Aliases",
-			// 	Value:  "_Note: Users can also use `/accesslist`, `/allowlist` or `/whitelist`_",
-			// 	Inline: false,
-			// },
 		},
 	}
 }

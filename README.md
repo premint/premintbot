@@ -112,7 +112,7 @@ When an admin performs an action
 
 ### `commands.slash_premint`
 
-When an admin performs an event
+When someone uses the `/premint` command
 
 | Field         | Type        |
 | ------------- | ----------- |

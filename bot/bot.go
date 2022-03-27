@@ -7,13 +7,13 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
+	"github.com/mager/premintbot/config"
+	"github.com/mager/premintbot/infura"
 	"github.com/mager/premintbot/premint"
 	"go.uber.org/zap"
 )
 
 var (
-	testAppID = "952680307881041960"
-	// testAppID = "950933570564800552"
 	// /premint slash command
 	premintCmd = &discordgo.ApplicationCommand{
 		Name:        "premint",
@@ -22,7 +22,7 @@ var (
 			{
 				Type:        discordgo.ApplicationCommandOptionString,
 				Name:        "address",
-				Description: "Your ETH address",
+				Description: "Your ETH address or ENS name",
 				Required:    false,
 			},
 		},
@@ -30,11 +30,13 @@ var (
 )
 
 func Start(
+	cfg config.Config,
 	dg *discordgo.Session,
 	logger *zap.SugaredLogger,
 	database *firestore.Client,
 	premintClient *premint.PremintClient,
 	bqClient *bigquery.Client,
+	infuraClient *infura.InfuraClient,
 ) {
 	ctx := context.Background()
 
@@ -48,8 +50,8 @@ func Start(
 		logger.Infof("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
 
-	dg.ApplicationCommandCreate(testAppID, "", premintCmd)
-	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient, bqClient))
+	dg.ApplicationCommandCreate(cfg.DiscordAppID, "", premintCmd)
+	dg.AddHandler(premintSlashCommand(ctx, logger, database, premintClient, bqClient, infuraClient))
 
 	// Open a websocket connection to Discord and begin listening.
 	wsErr := dg.Open()
