@@ -49,7 +49,7 @@ func RecordAdminAction(
 ) {
 	var (
 		ctx   = context.Background()
-		table = bq.DatasetInProject(projectID, "guilds").Table("admin_actions")
+		table = bq.DatasetInProject(projectID, "guilds").Table("admin_action")
 		u     = table.Inserter()
 		items = []*BQAdminAction{
 			{
