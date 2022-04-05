@@ -19,7 +19,7 @@ const authBearer = "Bearer"
 func ProvideRouter(lc fx.Lifecycle, logger *zap.SugaredLogger, magic *magicClient.API) *mux.Router {
 	var router = mux.NewRouter()
 
-	router.Use(magicMiddleware(magic), jsonMiddleware)
+	router.Use(jsonMiddleware)
 
 	lc.Append(
 		fx.Hook{
