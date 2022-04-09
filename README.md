@@ -2,6 +2,8 @@
 
 A Discord bot for Premint.
 
+Check out our docs on Gitbook: https://app.gitbook.com/o/o5A97qzJMGiY0hxx4tGG/s/2CxDE8Qy9tldVIW4mJv0/
+
 ## Endpoints
 
 - `GET /health` - Health check endpoint, used to keep the bot alive

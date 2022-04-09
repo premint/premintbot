@@ -92,46 +92,8 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			logger.Errorw("Failed to add owner to role", "guild", g.Guild.ID, "ownerID", ownerID, "error", err)
 		}
 
-		// Create Premint group
-		permissionOverwrites := []*discordgo.PermissionOverwrite{
-			// Allow for role
-			{
-				ID:   g.ID,
-				Type: discordgo.PermissionOverwriteTypeRole,
-				Deny: 0x0000000400,
-			},
-			// Hide for everyone else
-			{
-				ID:    role.ID,
-				Type:  discordgo.PermissionOverwriteTypeRole,
-				Allow: 0x0000000400,
-			},
-		}
-		group, err := s.GuildChannelCreateComplex(
-			g.Guild.ID,
-			discordgo.GuildChannelCreateData{
-				Type:                 discordgo.ChannelTypeGuildCategory,
-				Name:                 premintCategoryName,
-				PermissionOverwrites: permissionOverwrites,
-			},
-		)
-		if err != nil {
-			logger.Errorf("Failed to create channel: %v", err)
-		}
-
 		// Create #premint-config channel
-		c, err := s.GuildChannelCreateComplex(
-			g.Guild.ID,
-			discordgo.GuildChannelCreateData{
-				Type:                 discordgo.ChannelTypeGuildText,
-				Name:                 premintConfigChannelName,
-				ParentID:             group.ID,
-				PermissionOverwrites: permissionOverwrites,
-			},
-		)
-		if err != nil {
-			logger.Errorf("Failed to create channel: %v", err)
-		}
+		c := createPremintConfigChannel(s, g, role, logger)
 
 		// Create the guild
 		joinedAt := time.Now()
@@ -175,4 +137,49 @@ func createGeneralEmbed() *discordgo.MessageEmbed {
 			URL: "https://cdn.discordapp.com/avatars/420864490981227266/b7f9f9a9c7b6e5e6f7e8f8c1b7f1f2d6.png?size=2048",
 		},
 	}
+}
+
+func createPremintConfigChannel(s *discordgo.Session, g *discordgo.GuildCreate, role *discordgo.Role, logger *zap.SugaredLogger) *discordgo.Channel {
+	// Create Premint group
+	permissionOverwrites := []*discordgo.PermissionOverwrite{
+		// Allow for role
+		{
+			ID:   g.ID,
+			Type: discordgo.PermissionOverwriteTypeRole,
+			Deny: 0x0000000400,
+		},
+		// Hide for everyone else
+		{
+			ID:    role.ID,
+			Type:  discordgo.PermissionOverwriteTypeRole,
+			Allow: 0x0000000400,
+		},
+	}
+	group, err := s.GuildChannelCreateComplex(
+		g.Guild.ID,
+		discordgo.GuildChannelCreateData{
+			Type:                 discordgo.ChannelTypeGuildCategory,
+			Name:                 premintCategoryName,
+			PermissionOverwrites: permissionOverwrites,
+		},
+	)
+	if err != nil {
+		logger.Errorf("Failed to create channel: %v", err)
+	}
+
+	// Create #premint-config channel
+	c, err := s.GuildChannelCreateComplex(
+		g.Guild.ID,
+		discordgo.GuildChannelCreateData{
+			Type:                 discordgo.ChannelTypeGuildText,
+			Name:                 premintConfigChannelName,
+			ParentID:             group.ID,
+			PermissionOverwrites: permissionOverwrites,
+		},
+	)
+	if err != nil {
+		logger.Errorf("Failed to create channel: %v", err)
+	}
+
+	return c
 }

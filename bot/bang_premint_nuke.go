@@ -44,6 +44,6 @@ func premintNukeCommand(
 		}
 	}
 
-	// Set to inactive
-	p.doc.Ref.Update(ctx, []firestore.Update{{Path: "active", Value: false}})
+	// Delete the record
+	p.doc.Ref.Delete(ctx)
 }
