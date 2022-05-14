@@ -2,7 +2,7 @@
 
 A Discord bot for Premint.
 
-Check out our docs on Gitbook: https://app.gitbook.com/o/o5A97qzJMGiY0hxx4tGG/s/2CxDE8Qy9tldVIW4mJv0/
+## [Instructions for setting up the bot can be found at SETUP.md](./SETUP.md)
 
 ## Endpoints
 

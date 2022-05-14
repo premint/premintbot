@@ -85,7 +85,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			if p.Config.PremintRoleID != "" && !roleSet {
 				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, p.Config.PremintRoleID)
 				if err != nil {
-					logger.Errorw("Failed to add premint role", "guild", i.GuildID, "error", err)
+					logger.Errorw("Failed to add  role", "guild", i.GuildID, "error", err)
 					return
 				}
 			}
