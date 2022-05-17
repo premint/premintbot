@@ -1,4 +1,4 @@
-module github.com/mager/premintbot
+module github.com/premint/premintbot
 
 go 1.16
 

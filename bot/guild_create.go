@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	bq "github.com/mager/premintbot/bigquery"
+	bq "github.com/premint/premintbot/bigquery"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"

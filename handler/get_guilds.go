@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/mager/premintbot/bot"
+	"github.com/premint/premintbot/bot"
 )
 
 type GetGuildsResp struct {

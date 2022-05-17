@@ -7,9 +7,9 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
-	"github.com/mager/premintbot/config"
-	"github.com/mager/premintbot/infura"
-	"github.com/mager/premintbot/premint"
+	"github.com/premint/premintbot/config"
+	"github.com/premint/premintbot/infura"
+	"github.com/premint/premintbot/premint"
 	"go.uber.org/zap"
 )
 
