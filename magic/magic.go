@@ -3,9 +3,9 @@ package magic
 import (
 	"time"
 
-	"github.com/mager/premintbot/config"
 	"github.com/magiclabs/magic-admin-go"
 	"github.com/magiclabs/magic-admin-go/client"
+	"github.com/premint/premintbot/config"
 )
 
 func ProvideMagic(cfg config.Config) *client.API {

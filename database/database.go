@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"cloud.google.com/go/firestore"
-	"github.com/mager/premintbot/config"
+	"github.com/premint/premintbot/config"
 )
 
 // ProvideDB provides a firestore client

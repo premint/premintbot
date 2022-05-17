@@ -8,7 +8,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
-	bq "github.com/mager/premintbot/bigquery"
+	bq "github.com/premint/premintbot/bigquery"
 	"go.uber.org/zap"
 )
 
