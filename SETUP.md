@@ -35,7 +35,7 @@ Click Save Changes and then right-click your new role to copy the role ID.
 
 To set the role ID, in the `#premint-config channel`, type this command:
 
-> `!premint-set-role <Role ID>`
+> `!premint-set-role DISCORD_ROLE_ID`
 
 For example:
 
@@ -49,7 +49,7 @@ You can find your API key on the PREMINT website: [https://www.premint.xyz/dashb
 ​
 ![](./static/images/4.png)
 ​
-> `!premint-set-api-key <API key>`
+> `!premint-set-api-key PREMINT_API_KEY`
 
 For example:
 

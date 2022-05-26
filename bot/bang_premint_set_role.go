@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
@@ -21,11 +22,11 @@ func premintSetRoleCommand(
 	m *discordgo.MessageCreate,
 ) {
 	if m.Content == "!premint-set-role" {
-		s.ChannelMessageSend(m.ChannelID, "Missing role. Please use `!premint-set-role <Discord role ID>` to set it. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID.")
+		s.ChannelMessageSend(m.ChannelID, "Missing role. Please use `!premint-set-role DISCORD_ROLE_ID` to set it. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID.")
 		return
 	}
 
-	// Regex match !premint-set-role <Role ID>
+	// Regex match !premint-set-role DISCORD_ROLE_ID
 	re := regexp.MustCompile(`^!premint-set-role (.*)$`)
 	match := re.FindStringSubmatch(m.Content)
 
@@ -43,6 +44,16 @@ func premintSetRoleCommand(
 	}
 
 	roleID := match[1]
+
+	// If apiKey contains any of the bad characters, return an error
+	for _, c := range badChars {
+		if strings.Contains(roleID, c) {
+			s.ChannelMessageSend(m.ChannelID, "❌ Role ID contains invalid characters. Please use `!premint-set-role DISCORD_ROLE_ID` to set it.")
+			bq.RecordAdminAction(bqClient, m, "set-role", "bad-characters")
+			return
+		}
+	}
+
 	roleName := ""
 
 	for _, role := range g.Roles {

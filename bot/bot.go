@@ -27,6 +27,7 @@ var (
 			},
 		},
 	}
+	badChars = []string{"<", ">", "{", "}"}
 )
 
 func Start(
