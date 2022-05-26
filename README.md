@@ -17,8 +17,8 @@ A Discord bot for Premint.
 
 - `!premint` - Help
 - `!premint-setup` - Check setup status
-- `!premint-set-api-key <Premint API key>` - Set Premint API key
-- `!premint-set-role <Discord role ID>` - Set Discord role ID
+- `!premint-set-api-key PREMINT_API_KEY` - Set Premint API key
+- `!premint-set-role DISCORD_ROLE_ID` - Set Discord role ID
 - `!premint-nuke` - Delete all channels & roles
 
 ## How to run locally

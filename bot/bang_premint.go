@@ -84,7 +84,7 @@ func CreateAdminHelpEmbed() *discordgo.MessageEmbed {
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "Admin Setup",
-				Value:  "`!premint-setup` - Show the bot settings\n`!premint-set-api-key {Project API key}` - This connects the bot to a specific PREMINT project. You can find your API Key in the projects Settings > API\n`!premint-set-role <Discord role ID>` - Set the role you want your users to get when they are registered with Premint\n`!premint-nuke` - Delete all channels and set the guild to inactive",
+				Value:  "`!premint-setup` - Show the bot settings\n`!premint-set-api-key PREMINT_API_KEY` - This connects the bot to a specific PREMINT project. You can find your API Key in the projects Settings > API\n`!premint-set-role DISCORD_ROLE_ID` - Set the role you want your users to get when they are registered with Premint\n`!premint-nuke` - Delete all channels and set the guild to inactive",
 				Inline: false,
 			},
 		},

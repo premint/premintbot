@@ -23,7 +23,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
-					Content: "Premint API key is not set. Please ask an admin to run the `!premint-set-api-key <Premint API key>` command to set it.",
+					Content: "Premint API key is not set. Please ask an admin to run the `!premint-set-api-key PREMINT_API_KEY` command to set it.",
 				},
 			})
 			return
