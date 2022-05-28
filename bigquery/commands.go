@@ -9,6 +9,7 @@ import (
 )
 
 type BQSlashPremint struct {
+	Address     string
 	GuildID     string
 	UserID      string
 	Timestamp   time.Time

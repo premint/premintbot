@@ -35,6 +35,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 
 		resp := premint.CheckPremintStatusResp{}
 		withAddress := false
+		address := ""
 		if cmdData.Options == nil {
 			logger.Info("Checking premint status with the Discord user ID")
 			resp, err = premint.CheckPremintStatusForUser(logger, p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
@@ -46,14 +47,13 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			// TODO: Validate ETH address
 			withAddress = true
 			logger.Info("Checking premint status with the ETH wallet address")
-			addressOption := strings.ToLower(i.ApplicationCommandData().Options[0].StringValue())
-			address := ""
+			addressOption := i.ApplicationCommandData().Options[0].StringValue()
 			// Check if the address is actually an ENS name
 			if !strings.HasPrefix(addressOption, "0x") {
-				address = strings.ToLower(infuraClient.GetAddressFromENSName(addressOption))
+				address = infuraClient.GetAddressFromENSName(addressOption)
 				logger.Infow("Address is an ENS name", "resolved", address)
 			} else {
-				address = strings.ToLower(addressOption)
+				address = addressOption
 			}
 
 			resp, err = premint.CheckPremintStatusForAddress(logger, p.Config.PremintAPIKey, address)
@@ -64,6 +64,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		}
 
 		evt := &bq.BQSlashPremint{
+			Address:     address,
 			GuildID:     i.GuildID,
 			UserID:      i.Interaction.Member.User.ID,
 			Timestamp:   time.Now(),

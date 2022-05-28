@@ -50,7 +50,7 @@ var Options = ProvidePremint
 
 // CheckPremintStatusForUser checks if the user is registered on the Premint list
 // Example:
-// https://www.premint.xyz/api/6c808f0c6964bd664854f051b438ca8b3aafec70938e5deca6ab49662a789cac/discord/360541062839926785
+// https://api.premint.xyz/v1/6c808f0c6964bd664854f051b438ca8b3aafec70938e5deca6ab49662a789cac/discord/360541062839926785
 func CheckPremintStatusForUser(logger *zap.SugaredLogger, apiKey, userID string) (CheckPremintStatusResp, error) {
 	r := CheckPremintStatusResp{}
 	url := fmt.Sprintf("https://api.premint.xyz/v1/%s/discord/%s", apiKey, userID)
@@ -81,7 +81,7 @@ func CheckPremintStatusForUser(logger *zap.SugaredLogger, apiKey, userID string)
 }
 
 // CheckPremintStatusForAddress checks if the address is registered on the Premint list
-// Example: https://www.premint.xyz/api/6c808f0c6964bd664854f051b438ca8b3aafec70938e5deca6ab49662a789cac/wallet/0x064DcA21b1377D1655AC3CA3e95282D9494E5611
+// Example: https://api.premint.xyz/v1/6c808f0c6964bd664854f051b438ca8b3aafec70938e5deca6ab49662a789cac/wallet/0x064DcA21b1377D1655AC3CA3e95282D9494E5611
 func CheckPremintStatusForAddress(logger *zap.SugaredLogger, apiKey, address string) (CheckPremintStatusResp, error) {
 	r := CheckPremintStatusResp{}
 	url := fmt.Sprintf("https://api.premint.xyz/v1/%s/wallet/%s", apiKey, address)
