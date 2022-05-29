@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	bq "github.com/premint/premintbot/bigquery"
-
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
@@ -114,15 +112,15 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 		logger.Infow("Guild updated in database", zap.String("guild", guildID), zap.String("guild", guildName))
 
 		// Send an event to BigQuery
-		evt := &bq.BQGuildsCreate{
-			GuildID:          g.Guild.ID,
-			Timestamp:        joinedAt,
-			GuildName:        g.Guild.Name,
-			GuildAdminRoleID: role.ID,
-			OwnerID:          ownerID,
-			GuildAdmins:      guildAdmins,
-		}
-		bq.RecordGuildsCreate(bqClient, evt)
+		// evt := &bq.BQGuildsCreate{
+		// 	GuildID:          g.Guild.ID,
+		// 	Timestamp:        joinedAt,
+		// 	GuildName:        g.Guild.Name,
+		// 	GuildAdminRoleID: role.ID,
+		// 	OwnerID:          ownerID,
+		// 	GuildAdmins:      guildAdmins,
+		// }
+		// bq.RecordGuildsCreate(bqClient, evt)
 
 		s.ChannelMessageSendEmbed(c.ID, createGeneralEmbed())
 	}

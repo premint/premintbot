@@ -8,7 +8,6 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
-	bq "github.com/premint/premintbot/bigquery"
 
 	"github.com/bwmarrin/discordgo"
 	"go.uber.org/zap"
@@ -24,7 +23,7 @@ func premintSetAPIKeyCommand(
 ) {
 	if m.Content == "!premint-set-api-key" {
 		s.ChannelMessageSend(m.ChannelID, "Missing API key. Please use `!premint-set-api-key PREMINT_API_KEY` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API.")
-		bq.RecordAdminAction(bqClient, m, "set-api-key", "missing-api-key")
+		// bq.RecordAdminAction(bqClient, m, "set-api-key", "missing-api-key")
 		return
 	}
 
@@ -40,7 +39,7 @@ func premintSetAPIKeyCommand(
 
 	if !isAdmin(p, m.Author) {
 		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
-		bq.RecordAdminAction(bqClient, m, "set-api-key", "not-admin")
+		// bq.RecordAdminAction(bqClient, m, "set-api-key", "not-admin")
 		return
 	}
 
@@ -50,7 +49,7 @@ func premintSetAPIKeyCommand(
 	for _, c := range badChars {
 		if strings.Contains(apiKey, c) {
 			s.ChannelMessageSend(m.ChannelID, "❌ API key contains invalid characters. Please use `!premint-set-api-key PREMINT_API_KEY` to set it. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API.")
-			bq.RecordAdminAction(bqClient, m, "set-api-key", "bad-characters")
+			// bq.RecordAdminAction(bqClient, m, "set-api-key", "bad-characters")
 			return
 		}
 	}
@@ -59,7 +58,7 @@ func premintSetAPIKeyCommand(
 		{Path: "premint-api-key", Value: apiKey},
 	})
 
-	bq.RecordAdminAction(bqClient, m, "set-api-key", "success")
+	// bq.RecordAdminAction(bqClient, m, "set-api-key", "success")
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint API key updated: %s", match[1]))
 }
