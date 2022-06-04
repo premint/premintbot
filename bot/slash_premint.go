@@ -3,6 +3,7 @@ package bot
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"cloud.google.com/go/bigquery"
@@ -30,6 +31,12 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		var err error
 		var message string
 		cmdData := i.ApplicationCommandData()
+		userID := i.Member.User.ID
+		userIdInt, err := strconv.Atoi(userID)
+		if err != nil {
+			logger.Errorw("Failed to convert user ID to int", "user", userID, "error", err)
+			return
+		}
 
 		resp := premint.CheckPremintStatusResp{}
 		withAddress := false
@@ -81,10 +88,11 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				}
 			}
 
-			if p.Config.PremintRoleID != "" && !roleSet {
+			// If the user ID == the registered user's Discord ID in PREMINT, grant the user the role
+			if userIdInt == resp.DiscordID && p.Config.PremintRoleID != "" && !roleSet {
 				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, p.Config.PremintRoleID)
 				if err != nil {
-					logger.Errorw("Failed to add  role", "guild", i.GuildID, "error", err)
+					logger.Errorw("Failed to add role", "guild", i.GuildID, "userID", userID, "error", err)
 					return
 				}
 			}
