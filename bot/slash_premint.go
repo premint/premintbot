@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
+	bq "github.com/premint/premintbot/bigquery"
 	"github.com/premint/premintbot/infura"
 	"github.com/premint/premintbot/premint"
 	"go.uber.org/zap"
@@ -68,15 +70,15 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			}
 		}
 
-		// evt := &bq.BQSlashPremint{
-		// 	Address:     address,
-		// 	GuildID:     i.GuildID,
-		// 	UserID:      i.Interaction.Member.User.ID,
-		// 	Timestamp:   time.Now(),
-		// 	WithAddress: withAddress,
-		// 	Registered:  resp.Registered,
-		// }
-		// bq.RecordSlashPremint(bqClient, evt)
+		evt := &bq.BQSlashPremint{
+			Address:     address,
+			GuildID:     i.GuildID,
+			UserID:      i.Interaction.Member.User.ID,
+			Timestamp:   time.Now(),
+			WithAddress: withAddress,
+			Registered:  resp.Registered,
+		}
+		bq.RecordSlashPremint(bqClient, evt)
 
 		if resp.Registered {
 			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
