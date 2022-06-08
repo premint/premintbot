@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/bwmarrin/discordgo"
+	bq "github.com/premint/premintbot/bigquery"
 	"go.uber.org/zap"
 )
 
@@ -38,7 +39,7 @@ func premintSetRoleCommand(
 
 	if !isAdmin(p, m.Author) {
 		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
-		// bq.RecordAdminAction(bqClient, m, "set-role", "not-admin")
+		bq.RecordAdminAction(bqClient, m, "set-role", "not-admin")
 		return
 	}
 
@@ -48,7 +49,7 @@ func premintSetRoleCommand(
 	for _, c := range badChars {
 		if strings.Contains(roleID, c) {
 			s.ChannelMessageSend(m.ChannelID, "❌ Role ID contains invalid characters. Please use `!premint-set-role DISCORD_ROLE_ID` to set it.")
-			// bq.RecordAdminAction(bqClient, m, "set-role", "bad-characters")
+			bq.RecordAdminAction(bqClient, m, "set-role", "bad-characters")
 			return
 		}
 	}
@@ -69,11 +70,11 @@ func premintSetRoleCommand(
 				{Path: "premint-role-name", Value: roleName},
 			})
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint role updated: %s", roleName))
-			// bq.RecordAdminAction(bqClient, m, "set-role", "success")
+			bq.RecordAdminAction(bqClient, m, "set-role", "success")
 			return
 		}
 	}
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("❌ Role %s not found. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID.", roleID))
-	// bq.RecordAdminAction(bqClient, m, "set-role", "role-not-found")
+	bq.RecordAdminAction(bqClient, m, "set-role", "role-not-found")
 }
