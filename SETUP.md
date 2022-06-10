@@ -63,6 +63,17 @@ Once you've finished setting up your role & API key, you can type `!premint-setu
 
 ![](./static/images/6.png)
 
+### `!premint-nuke`
+
+Use this command with caution. To re-install the bot:
+
+- Run `!premint-nuke`
+- Delete the `#premint-config` channel
+- Kick the PREMINT Bot user
+- Reinstall the bot (scroll to the top of this doc for instructions)
+
+[Create an issue](https://github.com/premint/premintbot/issues) if you are having trouble!
+
 ## Interacting with the bot
 
 ### `!premint`
@@ -116,3 +127,7 @@ Please create a ticket in the `#support-ticket` channel in the PREMINT Discord.
 ![](./static/images/12.png)
 
 Reach out to `@mager` or `@mulligan` if you have any issues or questions!
+
+## Data Deletion
+
+If you would like to request removal of your data from our database, please create a Github issue.
