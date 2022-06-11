@@ -69,12 +69,20 @@ func premintSetRoleCommand(
 				{Path: "premint-role-id", Value: roleID},
 				{Path: "premint-role-name", Value: roleName},
 			})
+
 			s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint role updated: %s", roleName))
+
 			bq.RecordAdminAction(bqClient, m, "set-role", "success")
+
+			logger.Info("Updated Role ID", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
+
 			return
 		}
 	}
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("❌ Role %s not found. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID.", roleID))
+
 	bq.RecordAdminAction(bqClient, m, "set-role", "role-not-found")
+
+	logger.Info("Role not found", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
 }

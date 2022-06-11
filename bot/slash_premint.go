@@ -44,16 +44,16 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		withAddress := false
 		address := ""
 		if cmdData.Options == nil {
-			logger.Info("Checking premint status with the Discord user ID")
+			logger.Info("Checking PREMINT status with the current Discord user ID")
 			resp, err = premint.CheckPremintStatusForUser(logger, p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
 				return
 			}
 		} else {
+			logger.Info("Checking PREMINT status with the ETH wallet address")
 			// TODO: Validate ETH address
 			withAddress = true
-			logger.Info("Checking premint status with the ETH wallet address")
 			addressOption := i.ApplicationCommandData().Options[0].StringValue()
 			// Check if the address is actually an ENS name
 			if !strings.HasPrefix(addressOption, "0x") {
@@ -69,7 +69,6 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				return
 			}
 		}
-
 		evt := &bq.BQSlashPremint{
 			Address:     address,
 			GuildID:     i.GuildID,
@@ -79,12 +78,12 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			Registered:  resp.Registered,
 		}
 		bq.RecordSlashPremint(bqClient, evt)
-
 		if resp.Registered {
 			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 			roleSet := false
 			for _, role := range i.Interaction.Member.Roles {
 				if role == p.Config.PremintRoleID {
+					logger.Infow("Role already exists for user", "roleID", role, "userID", userID)
 					roleSet = true
 					break
 				}
@@ -97,6 +96,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 					logger.Errorw("Failed to add role", "guild", i.GuildID, "userID", userID, "error", err)
 					return
 				}
+				logger.Infof("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", p.Config.PremintRoleID)
 			}
 		} else {
 			if withAddress {
@@ -114,6 +114,5 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				Flags: 64,
 			},
 		})
-
 	}
 }

@@ -13,7 +13,14 @@ The first step is to invite the bot to your server:
 
 https://discord.com/oauth2/authorize?client_id=950933570564800552&permissions=268438552&scope=bot+applications.commands
 
-Once you've invited the bot, you'll see a new #premint-config channel.
+**NOTE** Once you've added the bot, two new roles will be created:
+
+* `PREMINT Bot` - This role is added to the bot
+* `Premintbot` - This role is added to the bot inviter
+
+![](./static/images/0.png)
+
+You should also now see a new #premint-config channel.
 
 ![](./static/images/1.png)
 
@@ -27,13 +34,13 @@ The bot allows you to associate a role with a user if they are registered on PRE
 
 Let's create a role that your users will get when they run the `/premint` command.
 
-In Discord, click `Server Settings`, then `Roles`, then `Create Role`. Add a name & color for your role.​
-
+In Discord, click `Server Settings`, then `Roles`, then `Create Role`. Add a name & color for your role.
+​
 ![](./static/images/2.png)
 ​
 Click Save Changes and then right-click your new role to copy the role ID.
 
-To set the role ID, in the `#premint-config channel`, type this command:
+To set the role ID, in the `#premint-config` channel, type this command:
 
 > `!premint-set-role DISCORD_ROLE_ID`
 
@@ -42,6 +49,10 @@ For example:
 > `!premint-set-role 955243562814021672`
 
 ![](./static/images/3.png)
+
+**IMPORTANT** The new custom role that you just created should be _below_ the two roles created by the bot earlier.
+
+![](./static/images/22.png)
 
 ### `!premint-set-api-key`
 
@@ -68,8 +79,8 @@ Once you've finished setting up your role & API key, you can type `!premint-setu
 Use this command with caution. To re-install the bot:
 
 - Run `!premint-nuke`
-- Delete the `#premint-config` channel
-- Kick the PREMINT Bot user
+- Kick the `PREMINT Bot` user or delete the integration (Server Settings > Integrations)
+- Delete the `Premintbot` role (Server Settings > Roles) 
 - Reinstall the bot (scroll to the top of this doc for instructions)
 
 [Create an issue](https://github.com/premint/premintbot/issues) if you are having trouble!

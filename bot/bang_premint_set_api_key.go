@@ -62,4 +62,6 @@ func premintSetAPIKeyCommand(
 	bq.RecordAdminAction(bqClient, m, "set-api-key", "success")
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint API key updated: %s", match[1]))
+
+	logger.Info("Updated Premint API key", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
 }
