@@ -28,7 +28,6 @@ type CheckPremintStatusResp struct {
 
 type PremintClient struct {
 	httpClient *http.Client
-	APIKey     string
 }
 
 // ProvidePremint provides an HTTP client

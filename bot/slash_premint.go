@@ -42,12 +42,16 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 
 		resp := premint.CheckPremintStatusResp{}
 		withAddress := false
+		roleAdded := false
 		address := ""
+		errMsg := ""
 		if cmdData.Options == nil {
 			logger.Info("Checking PREMINT status with the current Discord user ID")
 			resp, err = premint.CheckPremintStatusForUser(logger, p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
-				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
+				errMsg = "Failed to check premint status"
+				logger.Errorw(errMsg, "guild", i.GuildID, "error", err)
+				recordSlashPremint(bqClient, address, i, withAddress, resp.Registered, roleAdded, errMsg)
 				return
 			}
 		} else {
@@ -65,19 +69,13 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 
 			resp, err = premint.CheckPremintStatusForAddress(logger, p.Config.PremintAPIKey, address)
 			if err != nil {
-				logger.Errorw("Failed to check premint status", "guild", i.GuildID, "error", err)
+				errMsg = "Failed to check premint status"
+				recordSlashPremint(bqClient, address, i, withAddress, resp.Registered, roleAdded, errMsg)
+				logger.Errorw(errMsg, "guild", i.GuildID, "error", err)
 				return
 			}
 		}
-		evt := &bq.BQSlashPremint{
-			Address:     address,
-			GuildID:     i.GuildID,
-			UserID:      i.Interaction.Member.User.ID,
-			Timestamp:   time.Now(),
-			WithAddress: withAddress,
-			Registered:  resp.Registered,
-		}
-		bq.RecordSlashPremint(bqClient, evt)
+
 		if resp.Registered {
 			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 			roleSet := false
@@ -93,10 +91,13 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			if userIdInt == resp.DiscordID && p.Config.PremintRoleID != "" && !roleSet {
 				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, p.Config.PremintRoleID)
 				if err != nil {
-					logger.Errorw("Failed to add role", "guild", i.GuildID, "userID", userID, "error", err)
+					errMsg = "Failed to add role"
+					logger.Errorw(errMsg, "guild", i.GuildID, "userID", userID, "error", err)
+					recordSlashPremint(bqClient, address, i, withAddress, resp.Registered, roleAdded, errMsg)
 					return
 				}
-				logger.Infof("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", p.Config.PremintRoleID)
+				roleAdded = true
+				logger.Infow("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", p.Config.PremintRoleID)
 			}
 		} else {
 			if withAddress {
@@ -106,13 +107,37 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			}
 		}
 
+		recordSlashPremint(bqClient, address, i, withAddress, resp.Registered, roleAdded, "")
+
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: message,
-				// Ephemeral = this message is only visible to the user who invoked the Interaction,
+				// Ephemeral = this message is only visible to the user who invoked the interaction
 				Flags: 64,
 			},
 		})
 	}
+}
+
+func recordSlashPremint(
+	bqClient *bigquery.Client,
+	address string,
+	i *discordgo.InteractionCreate,
+	withAddress,
+	registered,
+	roleAdded bool,
+	errMsg string,
+) {
+	evt := &bq.BQSlashPremint{
+		Address:     address,
+		GuildID:     i.GuildID,
+		UserID:      i.Interaction.Member.User.ID,
+		Timestamp:   time.Now(),
+		WithAddress: withAddress,
+		Registered:  registered,
+		RoleAdded:   roleAdded,
+		ErrorMsg:    errMsg,
+	}
+	bq.RecordSlashPremint(bqClient, evt)
 }

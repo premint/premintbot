@@ -15,6 +15,8 @@ type BQSlashPremint struct {
 	Timestamp   time.Time
 	Registered  bool
 	WithAddress bool
+	RoleAdded   bool
+	ErrorMsg    string
 }
 
 func RecordSlashPremint(
