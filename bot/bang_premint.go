@@ -79,7 +79,7 @@ func CreateAdminHelpEmbed() *discordgo.MessageEmbed {
 		Description: "Here is what you can do with your PREMINT Bot:",
 		Color:       0x00ffff,
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: "❓ If you have any questions, please ask in the PREMINT Discord.",
+			Text: "❓ If you have any questions, please ask in the PREMINT Discord. Full setup instructions on Github: https://github.com/premint/premintbot/blob/main/SETUP.md",
 		},
 		Fields: []*discordgo.MessageEmbedField{
 			{

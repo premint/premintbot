@@ -26,14 +26,6 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 			guildName = g.Guild.Name
 		)
 
-		// Return early if the premint channel category exists
-		for _, category := range g.Guild.Channels {
-			if category.Name == premintCategoryName {
-				logger.Infow("Premint category already exists", zap.String("guild", guildID), zap.String("guild", guildName))
-				return
-			}
-		}
-
 		docsnap, err := database.Collection("guilds").Doc(guildID).Get(ctx)
 		if err != nil {
 			logger.Errorf("Failed to get guild: %v", err)
@@ -131,7 +123,7 @@ func guildCreate(ctx context.Context, logger *zap.SugaredLogger, database *fires
 func createGeneralEmbed() *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Title:       "PREMINT Bot",
-		Description: "Hello! My name is PREMINT Bot.\n\n" + "To get started, you need to set up the bot.\n\n" + "1. Set your Premint API Key with `!premint-set-api-key PREMINT_API_KEY`. You can find your API key on the Premint website: https://www.premint.xyz/dashboard/. Click on a project, then click Edit Settings, then API.\n" + "2. Set your Premint Role with `!premint-set-role DISCORD_ROLE_ID`\n" + "3. Run `!premint-setup` to check everything is set up correctly.\n\n_Run `!premint` for a list of commands._",
+		Description: "Hello! My name is PREMINT Bot.\n\n" + "To get started, you need to set up the bot.\n\n" + "1. Set your Premint API Key with `!premint-set-api-key PREMINT_API_KEY`. [You can find your API key on the PREMINT website](https://www.premint.xyz/dashboard/). Click on a project, then click Edit Settings, then API.\n" + "2. Set your Premint Role with `!premint-set-role DISCORD_ROLE_ID`\n" + "3. Run `!premint-setup` to check everything is set up correctly.\n\n_Run `!premint` for a list of commands. [Full setup instructions on Github](https://github.com/premint/premintbot/blob/main/SETUP.md)._",
 		Color:       0x00ff00,
 		Thumbnail: &discordgo.MessageEmbedThumbnail{
 			URL: "https://cdn.discordapp.com/avatars/420864490981227266/b7f9f9a9c7b6e5e6f7e8f8c1b7f1f2d6.png?size=2048",
