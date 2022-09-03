@@ -77,7 +77,6 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		}
 
 		if resp.Registered {
-			message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 			roleSet := false
 			for _, role := range i.Interaction.Member.Roles {
 				if role == p.Config.PremintRoleID {
@@ -98,6 +97,12 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				}
 				roleAdded = true
 				logger.Infow("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", p.Config.PremintRoleID)
+			}
+
+			if roleAdded {
+				message = fmt.Sprintf("✅ Wallet %s is registered on the %s list and the %s role was added to your account. %s", resp.WalletAddress, resp.ProjectName, p.Config.PremintRoleName, resp.ProjectURL)
+			} else {
+				message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 			}
 		} else {
 			if withAddress {
