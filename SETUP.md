@@ -32,6 +32,8 @@ The bot allows you to associate a role with a user if they are registered on PRE
 
 ### `!premint-set-role`
 
+**NOTE: This command is currently broken and we're working on a solution to fix it.**
+
 Let's create a role that your users will get when they run the `/premint` command.
 
 In Discord, click `Server Settings`, then `Roles`, then `Create Role`. Add a name & color for your role.
@@ -56,6 +58,8 @@ For example:
 
 ### `!premint-set-api-key`
 
+**NOTE: This command is currently broken and we're working on a solution to fix it.**
+
 You can find your API key on the PREMINT website: [https://www.premint.xyz/dashboard/](https://www.premint.xyz/dashboard/). Click on a project, then click `Edit Settings`, then `API`:
 ​
 ![](./static/images/4.png)
@@ -70,11 +74,15 @@ For example:
 
 ### `!premint-setup`
 
+**NOTE: This command is currently broken and we're working on a solution to fix it.**
+
 Once you've finished setting up your role & API key, you can type `!premint-setup` to verify that you're finished setting up the bot.
 
 ![](./static/images/6.png)
 
 ### `!premint-nuke`
+
+**NOTE: This command is currently broken and we're working on a solution to fix it.**
 
 Use this command with caution. To re-install the bot:
 
@@ -88,6 +96,8 @@ Use this command with caution. To re-install the bot:
 ## Interacting with the bot
 
 ### `!premint`
+
+**NOTE: This command is currently broken and we're working on a solution to fix it.**
 
 You can always type `!premint` to see a list of commands:
 
