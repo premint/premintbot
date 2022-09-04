@@ -36,9 +36,11 @@ func premintSetAPIKeyCommand(
 		return
 	}
 
-	p := GetConfig(ctx, logger, database, m.GuildID)
+	logger.Infow("!premint-set-api-key called", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
 
-	if !isAdmin(p, m.Author) {
+	cfg := GetConfig(ctx, logger, database, m.GuildID)
+
+	if !isAdmin(cfg, m.Author) {
 		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
 		bq.RecordAdminAction(bqClient, m, "set-api-key", "not-admin")
 		return
@@ -55,7 +57,7 @@ func premintSetAPIKeyCommand(
 		}
 	}
 
-	p.doc.Ref.Update(ctx, []firestore.Update{
+	cfg.doc.Ref.Update(ctx, []firestore.Update{
 		{Path: "premint-api-key", Value: apiKey},
 	})
 
@@ -63,5 +65,5 @@ func premintSetAPIKeyCommand(
 
 	s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("✅ Premint API key updated: %s", match[1]))
 
-	logger.Info("Updated Premint API key", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
+	logger.Infow("Updated Premint API key", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
 }

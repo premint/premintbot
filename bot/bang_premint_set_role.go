@@ -23,10 +23,11 @@ func premintSetRoleCommand(
 ) {
 	if m.Content == "!premint-set-role" {
 		s.ChannelMessageSend(m.ChannelID, "Missing role. Please use `!premint-set-role DISCORD_ROLE_ID` to set it. You can find your Discord role ID by going to Server Settings > Roles > Right click the role > Copy ID.")
+		bq.RecordAdminAction(bqClient, m, "set-role", "missing-role")
 		return
 	}
 
-	// Regex match !premint-set-role DISCORD_ROLE_ID
+	// Regex match !premint-set-role ROLE_ID
 	re := regexp.MustCompile(`^!premint-set-role (.*)$`)
 	match := re.FindStringSubmatch(m.Content)
 
@@ -34,10 +35,12 @@ func premintSetRoleCommand(
 		return
 	}
 
-	p := GetConfig(ctx, logger, database, m.GuildID)
+	logger.Infow("!premint-set-role called", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
+
+	cfg := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 
-	if !isAdmin(p, m.Author) {
+	if !isAdmin(cfg, m.Author) {
 		s.ChannelMessageSend(m.ChannelID, "❌ You do not have the Premintbot role. Please contact a server administrator to add it to your account.")
 		bq.RecordAdminAction(bqClient, m, "set-role", "not-admin")
 		return
@@ -63,9 +66,9 @@ func premintSetRoleCommand(
 	}
 
 	// Make sure the user has the Premintbot role: loop through their roles and make sure they have the guild admin role.
-	for _, admin := range p.Config.GuildAdmins {
+	for _, admin := range cfg.Config.GuildAdmins {
 		if admin == m.Author.ID {
-			p.doc.Ref.Update(ctx, []firestore.Update{
+			cfg.doc.Ref.Update(ctx, []firestore.Update{
 				{Path: "premint-role-id", Value: roleID},
 				{Path: "premint-role-name", Value: roleName},
 			})
@@ -74,7 +77,7 @@ func premintSetRoleCommand(
 
 			bq.RecordAdminAction(bqClient, m, "set-role", "success")
 
-			logger.Info("Updated Role ID", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
+			logger.Infow("Updated Role ID", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
 
 			return
 		}
@@ -84,5 +87,5 @@ func premintSetRoleCommand(
 
 	bq.RecordAdminAction(bqClient, m, "set-role", "role-not-found")
 
-	logger.Info("Role not found", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
+	logger.Infow("Role not found", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID), zap.String("roleID", roleID))
 }

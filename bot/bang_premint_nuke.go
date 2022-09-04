@@ -19,7 +19,9 @@ func premintNukeCommand(
 		return
 	}
 
-	p := GetConfig(ctx, logger, database, m.GuildID)
+	logger.Infow("!premint-nuke called", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
+
+	cfg := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 
 	// Make sure owner is sending the message
@@ -45,5 +47,6 @@ func premintNukeCommand(
 	}
 
 	// Delete the record
-	p.doc.Ref.Delete(ctx)
+	cfg.doc.Ref.Delete(ctx)
+	logger.Infow("Deleted config record", zap.String("guild", m.GuildID))
 }

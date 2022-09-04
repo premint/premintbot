@@ -69,20 +69,16 @@ func Start(
 
 func messageCreate(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient, bqClient *bigquery.Client) func(s *discordgo.Session, m *discordgo.MessageCreate) {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		// Ignore all messages created by the bot itself
-		// This isn't required in this specific example but it's a good practice.
-		if m.Author.ID == s.State.User.ID {
-			return
-		}
-
 		// Admin commands
-		premintNukeCommand(ctx, logger, database, s, m)
 		premintSetupCommand(ctx, logger, database, s, m)
 		premintSetAPIKeyCommand(ctx, logger, database, bqClient, s, m)
 		premintSetRoleCommand(ctx, logger, database, bqClient, s, m)
 
 		// Public commands
 		premintCommand(ctx, logger, database, s, m)
+
+		// Nuke everything
+		premintNukeCommand(ctx, logger, database, s, m)
 	}
 }
 

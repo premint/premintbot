@@ -69,7 +69,7 @@ func Register(
 	lc.Append(fx.Hook{
 		OnStop: func(ctx context.Context) error {
 			logger.Info("Closing Discord session")
-			defer dg.Close()
+			dg.Close()
 			if err != nil {
 				logger.Errorf("Failed to close Discord session: %v", err)
 			}

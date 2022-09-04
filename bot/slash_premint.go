@@ -18,9 +18,9 @@ import (
 
 func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, database *firestore.Client, premintClient *premint.PremintClient, bqClient *bigquery.Client, infuraClient *infura.InfuraClient) func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		p := GetConfig(ctx, logger, database, i.GuildID)
+		cfg := GetConfig(ctx, logger, database, i.GuildID)
 
-		if p.Config.PremintAPIKey == "" {
+		if cfg.Config.PremintAPIKey == "" {
 			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 				Type: discordgo.InteractionResponseChannelMessageWithSource,
 				Data: &discordgo.InteractionResponseData{
@@ -46,8 +46,8 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		address := ""
 		errMsg := ""
 		if cmdData.Options == nil {
-			logger.Info("Checking PREMINT status with the current Discord user ID")
-			resp, err = premint.CheckPremintStatusForUser(logger, p.Config.PremintAPIKey, i.Interaction.Member.User.ID)
+			logger.Infow("Checking PREMINT status with the current Discord user ID", "user", userID)
+			resp, err = premint.CheckPremintStatusForUser(logger, cfg.Config.PremintAPIKey, i.Interaction.Member.User.ID)
 			if err != nil {
 				errMsg = "Failed to check premint status"
 				logger.Errorw(errMsg, "guild", i.GuildID, "error", err)
@@ -55,7 +55,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				return
 			}
 		} else {
-			logger.Info("Checking PREMINT status with the ETH wallet address")
+			logger.Infow("Checking PREMINT status with the ETH wallet address", "address", cmdData.Options[0].StringValue())
 			// TODO: Validate ETH address
 			withAddress = true
 			addressOption := i.ApplicationCommandData().Options[0].StringValue()
@@ -67,7 +67,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 				address = addressOption
 			}
 
-			resp, err = premint.CheckPremintStatusForAddress(logger, p.Config.PremintAPIKey, address)
+			resp, err = premint.CheckPremintStatusForAddress(logger, cfg.Config.PremintAPIKey, address)
 			if err != nil {
 				errMsg = "Failed to check premint status"
 				recordSlashPremint(bqClient, address, i, withAddress, resp.Registered, roleAdded, errMsg)
@@ -79,7 +79,7 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 		if resp.Registered {
 			roleSet := false
 			for _, role := range i.Interaction.Member.Roles {
-				if role == p.Config.PremintRoleID {
+				if role == cfg.Config.PremintRoleID {
 					logger.Infow("Role already exists for user", "roleID", role, "userID", userID)
 					roleSet = true
 					break
@@ -87,8 +87,8 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 			}
 
 			// If the user ID == the registered user's Discord ID in PREMINT, grant the user the role
-			if userIdInt == resp.DiscordID && p.Config.PremintRoleID != "" && !roleSet {
-				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, p.Config.PremintRoleID)
+			if userIdInt == resp.DiscordID && cfg.Config.PremintRoleID != "" && !roleSet {
+				err = s.GuildMemberRoleAdd(i.GuildID, i.Interaction.Member.User.ID, cfg.Config.PremintRoleID)
 				if err != nil {
 					errMsg = "Failed to add role"
 					logger.Errorw(errMsg, "guild", i.GuildID, "userID", userID, "error", err)
@@ -96,11 +96,11 @@ func premintSlashCommand(ctx context.Context, logger *zap.SugaredLogger, databas
 					return
 				}
 				roleAdded = true
-				logger.Infow("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", p.Config.PremintRoleID)
+				logger.Infow("Added role to user", "guild", i.GuildID, "userID", userID, "roleID", cfg.Config.PremintRoleID)
 			}
 
 			if roleAdded {
-				message = fmt.Sprintf("✅ Wallet %s is registered on the %s list and the %s role was added to your account. %s", resp.WalletAddress, resp.ProjectName, p.Config.PremintRoleName, resp.ProjectURL)
+				message = fmt.Sprintf("✅ Wallet %s is registered on the %s list and the %s role was added to your account. %s", resp.WalletAddress, resp.ProjectName, cfg.Config.PremintRoleName, resp.ProjectURL)
 			} else {
 				message = fmt.Sprintf("✅ Wallet %s is registered on the %s list. %s", resp.WalletAddress, resp.ProjectName, resp.ProjectURL)
 			}

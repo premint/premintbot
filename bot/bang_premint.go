@@ -19,7 +19,9 @@ func premintCommand(
 		return
 	}
 
-	p := GetConfig(ctx, logger, database, m.GuildID)
+	logger.Infow("!premint called", zap.String("guild", m.GuildID), zap.String("user", m.Author.ID))
+
+	cfg := GetConfig(ctx, logger, database, m.GuildID)
 	g := getGuildFromMessage(s, m)
 
 	// Find #premint-config channel
@@ -30,7 +32,7 @@ func premintCommand(
 		}
 	}
 
-	if isAdmin(p, m.Author) && m.ChannelID == premintConfigChannel {
+	if isAdmin(cfg, m.Author) && m.ChannelID == premintConfigChannel {
 		_, err := s.ChannelMessageSendEmbed(m.ChannelID, CreateAdminHelpEmbed())
 		if err != nil {
 			logger.Errorw("Failed to send help message", "guild", m.GuildID, "error", err)
